@@ -1,0 +1,65 @@
+{
+  "name": "@aleks-web/ui",
+  "version": "0.1.0",
+  "description": "Private reusable Svelte 5 UI components for Aleks Web applications",
+  "type": "module",
+  "author": "aleks-web",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aleks-web/svelte-ui.git"
+  },
+  "homepage": "https://github.com/aleks-web/svelte-ui#readme",
+  "bugs": {
+    "url": "https://github.com/aleks-web/svelte-ui/issues"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "COMPONENTS.md"
+  ],
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./stats-grid/persistence": {
+      "types": "./dist/stats-grid/stats-grid.persistence.d.ts",
+      "default": "./dist/stats-grid/stats-grid.persistence.js"
+    }
+  },
+  "scripts": {
+    "build": "svelte-package",
+    "dev": "svelte-package --watch",
+    "check": "svelte-package && svelte-check --tsconfig ./tsconfig.json",
+    "prepare": "npm run build"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "dependencies": {
+    "flowbite-svelte-icons": "^3.1.0",
+    "imask": "^7.6.1",
+    "melt": "^0.44.0",
+    "tailwind-merge": "^3.5.0",
+    "tailwind-variants": "^3.3.1"
+  },
+  "devDependencies": {
+    "@sveltejs/package": "^2.5.8",
+    "prettier": "^3.8.1",
+    "prettier-plugin-svelte": "^3.4.1",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "svelte": "^5.57.2",
+    "svelte-check": "^4.4.2",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3"
+  }
+}
