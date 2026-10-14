@@ -23,12 +23,12 @@ Do not commit a real registry token.
 
 ## Local workspace use
 
-The monorepo root declares `packages/ui` as an npm workspace. A sibling application installs it as a normal dependency:
+For development before publishing, a consuming application can pin a GitHub commit:
 
 ```json
 {
   "dependencies": {
-    "@aleks-web/ui": "0.1.0"
+    "@aleks-web/ui": "github:aleks-web/svelte-ui#<commit-sha>"
   }
 }
 ```
@@ -39,32 +39,29 @@ The monorepo root declares `packages/ui` as an npm workspace. A sibling applicat
 </script>
 ```
 
-Build and validate from the MyService workspace root:
+Build and validate in this repository:
 
 ```bash
-npm run ui:build
-npm run ui:check
+npm ci
+npm run check
+npm pack --dry-run
 ```
 
 ## Tailwind CSS 4
 
-The consuming application must let Tailwind scan the package source. In its main CSS file add a source relative to that file:
+The consuming application must let Tailwind scan the compiled package files. In its main CSS file add a source relative to that file:
 
 ```css
 @import 'tailwindcss';
-@source '../../../packages/ui/src/lib';
-```
-
-For an installed package outside this monorepo, point `@source` at its compiled Svelte files. Adjust the relative path from the application's CSS entry point:
-
-```css
 @source '../node_modules/@aleks-web/ui/dist';
 ```
+
+Adjust the relative path from the application's CSS entry point when needed.
 
 ## Peer and runtime dependencies
 
 - `svelte` and `tailwindcss` are peer dependencies: the application owns their versions and global CSS setup.
-- Melt, Tailwind Variants, `tailwind-merge`, `flowbite-svelte-icons` and `imask` are runtime dependencies of this package and are installed transitively.
+- Melt, Tailwind Variants, `tailwind-merge`, `flowbite-svelte-icons`, `imask` and Splide are runtime dependencies of this package and are installed transitively.
 - Consumers import public APIs only from `@aleks-web/ui` or the documented `@aleks-web/ui/stats-grid/persistence` subpath.
 
 ## Private publishing
@@ -77,12 +74,6 @@ For a standalone clone of this repository:
 npm ci
 npm run check
 npm publish
-```
-
-From the MyService workspace root:
-
-```bash
-npm publish --workspace @aleks-web/ui
 ```
 
 Publish only after checks and a version bump. Publishing requires a token with `write:packages`.

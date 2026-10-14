@@ -19,6 +19,7 @@
 		id: string;
 		title: string;
 		kind?: DataTableColumnKind;
+		actionPlacement?: 'start' | 'end';
 		width?: string;
 		align?: DataTableAlign;
 		headerClass?: string;
@@ -34,13 +35,12 @@
 </script>
 
 <script lang="ts" generics="T, C extends DataTableColumn<T>">
-	import ScrollArea from '../ScrollArea.svelte';
-	import type { ScrollAreaState } from '../ScrollArea.svelte';
-	import Checkbox from '../checkbox/Checkbox.svelte';
-	import type { CheckboxState } from '../checkbox/Checkbox.svelte';
+	import Checkbox, { type CheckboxState } from '../checkbox/Checkbox.svelte';
+	import ScrollArea, { type ScrollAreaState } from '../ScrollArea.svelte';
 	import Spinner from '../spinner/Spinner.svelte';
 	import type { SpinnerSize } from '../spinner/spinner.variants';
 	import { onDestroy, onMount, type Snippet } from 'svelte';
+	import { SvelteSet } from 'svelte/reactivity';
 	import {
 		dataTableCellVariants,
 		dataTableHeadCellVariants,
@@ -97,7 +97,7 @@
 	};
 
 	type StoredColumnWidths = {
-		version: 1;
+		version: 3;
 		columns: Record<string, number>;
 	};
 	type StoredColumnLayout = {
@@ -146,7 +146,7 @@
 		onColumnVisibilityChange
 	}: Props = $props();
 
-	const COLUMN_WIDTH_STORAGE_PREFIX = 'saas:data-table:column-widths:v1:';
+	const COLUMN_WIDTH_STORAGE_PREFIX = 'saas:data-table:column-widths:v3:';
 	const COLUMN_LAYOUT_STORAGE_PREFIX = 'saas:data-table:column-layout:v1:';
 	const HEADER_HEIGHT = 46;
 	let hoveredRowKey: string | number | null = $state(null);
@@ -171,6 +171,10 @@
 		orderedColumns.filter(
 			(column) => column.kind === 'actions' || !hiddenColumnIdSet.has(column.id)
 		)
+	);
+	let fillColumnId = $derived(
+		[...visibleColumns].reverse().find((column) => column.kind !== 'actions')?.id ??
+			visibleColumns.at(-1)?.id
 	);
 	let configurableColumns = $derived(orderedColumns.filter((column) => column.kind !== 'actions'));
 	let columnSettingsItems = $derived<DataTableColumnSettingsItem[]>(
@@ -268,7 +272,12 @@
 		requestedOrder: readonly string[]
 	): C[] {
 		const dataColumns = sourceColumns.filter((column) => column.kind !== 'actions');
-		const actionColumns = sourceColumns.filter((column) => column.kind === 'actions');
+		const leadingActionColumns = sourceColumns.filter(
+			(column) => column.kind === 'actions' && column.actionPlacement === 'start'
+		);
+		const trailingActionColumns = sourceColumns.filter(
+			(column) => column.kind === 'actions' && column.actionPlacement !== 'start'
+		);
 		const dataColumnsById = new Map(dataColumns.map((column) => [column.id, column]));
 		const reconciledIds = [
 			...new Set(requestedOrder.filter((columnId) => dataColumnsById.has(columnId)))
@@ -295,11 +304,12 @@
 		}
 
 		return [
+			...leadingActionColumns,
 			...reconciledIds.flatMap((columnId) => {
 				const column = dataColumnsById.get(columnId);
 				return column ? [column] : [];
 			}),
-			...actionColumns
+			...trailingActionColumns
 		];
 	}
 
@@ -395,7 +405,11 @@
 		columnOrder = nextOrder;
 		saveColumnLayout(nextOrder, hiddenColumnIds);
 		if (onColumnOrderChange) void onColumnOrderChange([...nextOrder]);
-		scheduleColumnMeasurement();
+
+		// Widths are stored by column id, so reordering must not measure them again.
+		// The last visible column can be stretched to fill the remaining space; persisting
+		// that rendered width and then moving it produces an artificial table overflow.
+		window.requestAnimationFrame(measureHeaderHeight);
 	}
 
 	function handleColumnVisibilityChange(columnId: string, visible: boolean): void {
@@ -481,9 +495,10 @@
 	}
 
 	function getColumnWidth(column: C): string | undefined {
-		if (column.kind === 'actions') return column.width ?? 'max-content';
-
 		const resizedWidth = columnWidths[column.id];
+		if (column.kind === 'actions') {
+			return resizedWidth === undefined ? (column.width ?? 'max-content') : `${resizedWidth}px`;
+		}
 
 		if (resizeMode === 'fit') {
 			const width = resizedWidth ?? getInitialColumnWeight(column);
@@ -497,17 +512,23 @@
 			return totalWidth && totalWidth > 0 ? `${(width / totalWidth) * 100}%` : undefined;
 		}
 
-		return resizedWidth === undefined ? column.width : `${resizedWidth}px`;
+		if (resizedWidth === undefined) return column.width;
+		if (column.id !== fillColumnId || resizedTableWidth === null) return `${resizedWidth}px`;
+
+		const occupiedWidth = Math.max(0, resizedTableWidth - resizedWidth);
+		return `max(${resizedWidth}px, calc(100% - ${occupiedWidth}px))`;
 	}
 
 	function canResizeColumn(column: C): boolean {
-		return resizableColumns && column.kind !== 'actions' && column.resizable !== false;
+		return (
+			resizableColumns &&
+			column.resizable !== false &&
+			(column.kind !== 'actions' || column.resizable === true)
+		);
 	}
 
 	function showsResizeHandle(column: C): boolean {
-		const columnIndex = visibleColumns.indexOf(column);
-		const nextColumn = columnIndex >= 0 ? visibleColumns[columnIndex + 1] : undefined;
-		return canResizeColumn(column) && nextColumn?.kind !== 'actions';
+		return canResizeColumn(column);
 	}
 
 	function isBeforeActionsColumn(column: C): boolean {
@@ -542,7 +563,7 @@
 			if (!rawValue) return null;
 
 			const value = JSON.parse(rawValue) as Partial<StoredColumnWidths>;
-			if (value.version !== 1 || !value.columns || typeof value.columns !== 'object') {
+			if (value.version !== 3 || !value.columns || typeof value.columns !== 'object') {
 				window.localStorage.removeItem(key);
 				return null;
 			}
@@ -557,7 +578,9 @@
 		const key = getColumnWidthStorageKey();
 		if (!key || !hasMeasuredColumnWidths) return;
 
-		const persistableColumns = columns.filter((column) => column.kind !== 'actions');
+		const persistableColumns = columns.filter(
+			(column) => column.kind !== 'actions' || column.resizable === true
+		);
 		const savedColumns = Object.fromEntries(
 			persistableColumns.flatMap((column) => {
 				const width = columnWidths[column.id];
@@ -572,7 +595,7 @@
 		try {
 			window.localStorage.setItem(
 				key,
-				JSON.stringify({ version: 1, columns: savedColumns } satisfies StoredColumnWidths)
+				JSON.stringify({ version: 3, columns: savedColumns } satisfies StoredColumnWidths)
 			);
 		} catch {
 			// The table remains usable when browser storage is unavailable or full.
@@ -609,7 +632,7 @@
 
 		const restoredWidths = { ...measuredWidths };
 		for (const column of columns) {
-			if (column.kind === 'actions') continue;
+			if (column.kind === 'actions' && column.resizable !== true) continue;
 			const storedWidth = stored.columns[column.id];
 			if (!Number.isFinite(storedWidth) || storedWidth <= 0) continue;
 
@@ -640,7 +663,32 @@
 		widths: Record<string, number>
 	): Record<string, number> {
 		if (resizeMode === 'overflow') {
-			return { ...widths, [column.id]: widths[column.id] + delta };
+			const nextWidths = { ...widths, [column.id]: widths[column.id] + delta };
+
+			// The last data column fills otherwise unused table space, so use it first.
+			// Other columns can then yield width down to their own minimums. Only the
+			// remainder is allowed to increase the total table width and create overflow.
+			if (delta > 0) {
+				let remainingDelta = delta;
+				const partners = getResizePartners(column).sort((left, right) => {
+					if (left.id === fillColumnId) return -1;
+					if (right.id === fillColumnId) return 1;
+					return 0;
+				});
+
+				for (const partner of partners) {
+					if (remainingDelta <= 0) break;
+					const partnerWidth = nextWidths[partner.id];
+					const transferableWidth = Math.min(
+						remainingDelta,
+						Math.max(0, partnerWidth - getColumnMinWidth(partner))
+					);
+					nextWidths[partner.id] = partnerWidth - transferableWidth;
+					remainingDelta -= transferableWidth;
+				}
+			}
+
+			return nextWidths;
 		}
 
 		const nextWidths = { ...widths };
@@ -809,14 +857,14 @@
 
 	function handleRowSelection(row: T): void {
 		const key = rowKey(row);
-		const nextKeys = new Set(selectedRowKeys);
+		const nextKeys = new SvelteSet(selectedRowKeys);
 		if (nextKeys.has(key)) nextKeys.delete(key);
 		else nextKeys.add(key);
 		updateSelection([...nextKeys]);
 	}
 
 	function handleVisibleSelection(checked: CheckboxState): void {
-		const nextKeys = new Set(selectedRowKeys);
+		const nextKeys = new SvelteSet(selectedRowKeys);
 		if (checked === true) {
 			for (const key of selectableVisibleKeys) nextKeys.add(key);
 		} else {
@@ -928,7 +976,7 @@
 				? undefined
 				: resizeMode === 'fit'
 					? '100%'
-					: `${resizedTableWidth}px`}
+					: `max(100%, ${resizedTableWidth}px)`}
 			aria-label={ariaLabel}
 		>
 			<colgroup>

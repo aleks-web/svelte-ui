@@ -21,7 +21,7 @@ export const dataTableVariants = tv({
 export const dataTableHeadCellVariants = tv({
 	base: 'data-table__head-cell relative whitespace-nowrap',
 	variants: {
-		resizeMode: { fit: 'overflow-hidden', overflow: '' },
+		resizeMode: { fit: 'overflow-hidden', overflow: 'overflow-hidden' },
 		sortable: { true: 'p-0', false: 'px-4 py-3.5' },
 		align: { left: 'text-left', center: 'text-center', right: 'text-right' },
 		kind: {
@@ -82,10 +82,10 @@ export const dataTableCellVariants = tv({
 			default: 'px-4 py-3',
 			comfortable: 'px-4 py-4'
 		},
-		resizeMode: { fit: 'overflow-hidden', overflow: '' },
+		resizeMode: { fit: 'overflow-hidden', overflow: 'overflow-hidden' },
 		align: { left: 'text-left', center: 'text-center', right: 'text-right' },
 		kind: {
-			data: '',
+			data: 'min-w-0 [overflow-wrap:anywhere]',
 			actions: 'w-px min-w-max overflow-visible whitespace-nowrap pl-4 pr-8'
 		}
 	},

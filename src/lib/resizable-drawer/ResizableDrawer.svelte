@@ -12,6 +12,7 @@
 		backdropLabel?: string;
 		defaultWidth?: number;
 		minWidth?: number;
+		minViewportWidth?: number;
 		maxWidth?: number;
 		storageKey?: string;
 		resizable?: boolean;
@@ -32,6 +33,7 @@
 		backdropLabel = 'Закрыть окно',
 		defaultWidth = 760,
 		minWidth = 520,
+		minViewportWidth = 0,
 		maxWidth = 1080,
 		storageKey,
 		resizable = true,
@@ -68,7 +70,10 @@
 		const safeGutter =
 			resizable && window.matchMedia('(min-width: 640px)').matches ? handleSafeGutter : 0;
 		drawerMaxWidth = Math.min(maxWidth, Math.max(0, window.innerWidth - safeGutter));
-		drawerMinWidth = Math.min(minWidth, drawerMaxWidth);
+		drawerMinWidth = Math.min(
+			Math.max(minWidth, window.innerWidth * Math.max(0, Math.min(1, minViewportWidth))),
+			drawerMaxWidth
+		);
 		drawerWidth = Math.min(drawerMaxWidth, Math.max(drawerMinWidth, drawerWidth));
 	}
 
@@ -157,7 +162,7 @@
 
 <dialog
 	{...dialog.content}
-	class={`melt-resizable-drawer m-0 ml-auto h-dvh max-h-none max-w-full translate-x-full overflow-visible border-0 bg-transparent p-0 transition-transform duration-300 ease-out outline-none will-change-transform data-[open]:translate-x-0 motion-reduce:transition-none ${showOverlay ? 'drawer-with-overlay' : ''}`}
+	class={`melt-resizable-drawer m-0 ml-auto h-dvh max-h-none max-w-full translate-x-full overflow-visible border-0 bg-transparent p-0 transition-transform duration-300 ease-out will-change-transform outline-none data-[open]:translate-x-0 motion-reduce:transition-none ${showOverlay ? 'drawer-with-overlay' : ''}`}
 	style:z-index={zIndex + 1}
 	style:--drawer-panel-width={`${drawerWidth}px`}
 	aria-label={ariaLabel}

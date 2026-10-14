@@ -1,20 +1,48 @@
 <script module lang="ts">
+	export type ChatComposerReply = {
+		id: string;
+		senderDisplayName: string;
+		text: string;
+	};
+	export type ChatComposerSendContext = {
+		replyTo: ChatComposerReply | null;
+	};
+	export type ChatComposerConfirmContext = ChatComposerSendContext & {
+		files: File[];
+	};
 	export type ChatComposerSendResult = boolean | void | Promise<boolean | void>;
 	export type ChatComposerAttachmentSendResult = boolean | void | Promise<boolean | void>;
+	export type ChatComposerConfirmResult = boolean | Promise<boolean>;
 </script>
 
 <script lang="ts">
 	import { Popover } from 'melt/builders';
-	import ScrollArea from '../ScrollArea.svelte';
 	import Button from '../button/Button.svelte';
-	import { FaceGrinOutline, PaperClipOutline, PaperPlaneSolid } from 'flowbite-svelte-icons';
+	import ScrollArea from '../ScrollArea.svelte';
+	import {
+		CloseOutline,
+		FaceGrinOutline,
+		PaperClipOutline,
+		PaperPlaneSolid,
+		ReplyOutline
+	} from 'flowbite-svelte-icons';
 	import { onDestroy, tick } from 'svelte';
 	import { chatComposerVariants } from './chat-composer.variants';
 
 	type Props = {
 		value?: string;
-		onSend: (value: string) => ChatComposerSendResult;
-		onSendAttachments?: (value: string, files: File[]) => ChatComposerAttachmentSendResult;
+		onSend: (value: string, context: ChatComposerSendContext) => ChatComposerSendResult;
+		onSendAttachments?: (
+			value: string,
+			files: File[],
+			context: ChatComposerSendContext
+		) => ChatComposerAttachmentSendResult;
+		confirmBeforeSend?: (
+			value: string,
+			context: ChatComposerConfirmContext
+		) => ChatComposerConfirmResult;
+		replyTo?: ChatComposerReply | null;
+		onCancelReply?: () => void;
 		id?: string;
 		placeholder?: string;
 		ariaLabel?: string;
@@ -34,6 +62,9 @@
 		value = $bindable(''),
 		onSend,
 		onSendAttachments,
+		confirmBeforeSend,
+		replyTo = null,
+		onCancelReply,
 		id = 'chat-message',
 		placeholder = 'Напишите сообщение…',
 		ariaLabel = 'Сообщение',
@@ -161,13 +192,17 @@
 
 		submitting = true;
 		try {
-			const result = selectedFiles.length
-				? await onSendAttachments?.(message, selectedFiles)
-				: await onSend(message);
+			const context = { replyTo };
+			const files = [...selectedFiles];
+			if ((await confirmBeforeSend?.(message, { ...context, files })) === false) return;
+			const result = files.length
+				? await onSendAttachments?.(message, files, context)
+				: await onSend(message, context);
 			if (result === false) return;
 			value = '';
 			selectedFiles = [];
 			attachmentError = '';
+			onCancelReply?.();
 			contentHeight = minHeight;
 			await tick();
 			updateSize();
@@ -185,14 +220,15 @@
 	function matchesAccept(file: File): boolean {
 		return attachmentAccept.split(',').some((rule) => {
 			const normalized = rule.trim().toLowerCase();
+			if (normalized === '*/*') return true;
 			return normalized.endsWith('/*')
 				? file.type.toLowerCase().startsWith(normalized.slice(0, -1))
 				: file.type.toLowerCase() === normalized;
 		});
 	}
 
-	function chooseFiles(event: Event): void {
-		const files = Array.from((event.currentTarget as HTMLInputElement).files ?? []);
+	function addFiles(files: File[]): void {
+		if (!files.length) return;
 		attachmentError = '';
 		const next = [...selectedFiles, ...files].filter(
 			(file, index, all) =>
@@ -211,7 +247,28 @@
 		else if (next.length > maxAttachments)
 			attachmentError = `Можно прикрепить не больше ${maxAttachments} файлов.`;
 		else selectedFiles = next;
+	}
+
+	function chooseFiles(event: Event): void {
+		const files = Array.from((event.currentTarget as HTMLInputElement).files ?? []);
+		addFiles(files);
 		if (fileInput) fileInput.value = '';
+	}
+
+	function handlePaste(event: ClipboardEvent): void {
+		if (!attachments || !onSendAttachments || inactive) return;
+		const clipboard = event.clipboardData;
+		if (!clipboard) return;
+
+		const filesFromItems = Array.from(clipboard.items)
+			.filter((item) => item.kind === 'file')
+			.map((item) => item.getAsFile())
+			.filter((file): file is File => file !== null);
+		const files = filesFromItems.length ? filesFromItems : Array.from(clipboard.files);
+		if (!files.length) return;
+
+		event.preventDefault();
+		addFiles(files);
 	}
 
 	function removeFile(index: number): void {
@@ -297,6 +354,30 @@
 
 <form onsubmit={handleSubmit} class={className}>
 	<label class="sr-only" for={id}>{ariaLabel}</label>
+	{#if replyTo}
+		<div
+			class="mb-2 flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-left"
+		>
+			<ReplyOutline class="size-4 shrink-0 text-blue-600" strokeWidth={1.7} />
+			<div class="min-w-0 flex-1">
+				<p class="truncate text-xs font-semibold text-blue-800">
+					Ответ для {replyTo.senderDisplayName}
+				</p>
+				<p class="truncate text-xs text-slate-600">{replyTo.text}</p>
+			</div>
+			<Button
+				type="button"
+				variant="ghost"
+				size="icon"
+				class="size-7 shrink-0 text-slate-500"
+				aria-label="Отменить ответ"
+				title="Отменить ответ"
+				onclick={() => onCancelReply?.()}
+			>
+				<CloseOutline class="size-3.5" strokeWidth={1.8} />
+			</Button>
+		</div>
+	{/if}
 	<div class={styles.root()} style={`height: ${viewportHeight}px;`} aria-disabled={inactive}>
 		{#if resizable}
 			<!-- A focusable ARIA separator is an interactive resize control. -->
@@ -336,6 +417,7 @@
 				disabled={inactive}
 				oninput={(event) => updateSize(event.currentTarget)}
 				onkeydown={handleKeydown}
+				onpaste={handlePaste}
 				class={`${styles.textarea()} ${selectedFiles.length ? 'pb-24' : 'pb-12'}`}
 				style={`height: ${textareaHeight}px;`}
 			></textarea>
@@ -415,6 +497,12 @@
 		</div>
 	</div>
 	{#if attachmentError}<p class="mt-1 text-xs text-red-600" role="alert">{attachmentError}</p>{/if}
+	{#if attachments && onSendAttachments}
+		<p class="mt-1.5 text-xs text-slate-500">
+			Вложения можно выбрать по скрепке или вставить из буфера сочетанием
+			<kbd class="rounded bg-slate-100 px-1.5 py-0.5 font-sans text-slate-600">Ctrl+V</kbd>.
+		</p>
+	{/if}
 	<div
 		{...emojiPopover.content}
 		class="z-[220] m-0 w-72 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl"
@@ -427,7 +515,7 @@
 			verticalLabel="Прокрутка списка эмодзи"
 		>
 			<div class="grid grid-cols-8 gap-1 p-2 pr-3">
-				{#each emojis as emoji}
+				{#each emojis as emoji (emoji)}
 					<button
 						type="button"
 						class="grid min-h-8 place-items-center rounded-lg text-base transition hover:bg-blue-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"

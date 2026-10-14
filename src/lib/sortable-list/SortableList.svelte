@@ -2,6 +2,7 @@
 	import { flip } from 'svelte/animate';
 	import { BarsOutline } from 'flowbite-svelte-icons';
 	import { untrack, type Snippet } from 'svelte';
+	import { SvelteMap } from 'svelte/reactivity';
 	import { sortableListVariants } from './sortable-list.variants';
 
 	type Props = {
@@ -36,7 +37,7 @@
 	let pointerId = $state<number | null>(null);
 	let liveMessage = $state('');
 	let rootElement: HTMLDivElement;
-	const itemElements = new Map<string, HTMLElement>();
+	const itemElements = new SvelteMap<string, HTMLElement>();
 
 	$effect(() => {
 		const latestItems = items;
@@ -127,8 +128,7 @@
 		while (scrollParent) {
 			const overflowY = getComputedStyle(scrollParent).overflowY;
 			if (
-				(scrollParent.scrollHeight > scrollParent.clientHeight &&
-					overflowY === 'auto') ||
+				(scrollParent.scrollHeight > scrollParent.clientHeight && overflowY === 'auto') ||
 				overflowY === 'scroll'
 			) {
 				break;
@@ -304,7 +304,7 @@
 			>
 				<BarsOutline class={styles.handleIcon()} strokeWidth={1.75} />
 			</button>
-		<div class={styles.content()}>{@render children(item, index)}</div>
+			<div class={styles.content()}>{@render children(item, index)}</div>
 		</div>
 	{/each}
 	<div class={sortableListVariants().liveRegion()} aria-live="polite">{liveMessage}</div>

@@ -16,6 +16,17 @@ Most components accept `class` for root-level additions. Classes are merged with
 
 ## Actions and compact indicators
 
+### `ActionMenu`
+
+Compact accessible overflow menu for contextual actions.
+
+- Required `options: ActionMenuOption[]`; every option has `id`, `label` and optional `description`, `disabled`, `icon`, `tone` (`default | warning | danger`).
+- `ariaLabel='Действия'`, `disabled=false`, `class?`, `onSelect?(option)`, `onOpenChange?(open)`.
+
+```svelte
+<ActionMenu options={actions} onSelect={(action) => runAction(action.id)} />
+```
+
 ### `Button`
 
 Standard action or form button. It forwards ordinary HTML button attributes and can render a loading spinner.
@@ -68,6 +79,19 @@ Reusable export action with a dropdown of formats.
 ```
 
 ## Form controls
+
+### `TextField` and `TextArea`
+
+Labeled, bindable text controls that forward native input/textarea attributes.
+
+- Both require `label`, support bindable `value`, `description?`, `name?`, `id?`, `class?` and native attributes.
+- `TextField`: `type` is `text | url | email | password | date`; `inputClass?`.
+- `TextArea`: `rows=8`, `textareaClass?`, bindable `element` reference.
+
+```svelte
+<TextField label="Название" name="title" bind:value={title} required />
+<TextArea label="Описание" name="description" bind:value={description} rows={6} />
+```
 
 ### `Select`
 
@@ -173,7 +197,7 @@ Important optional props:
 - Interaction: `onRowClick?`, `rowLabel?`.
 - Loading and scrolling: `loadingSpinnerSize?`, `topFade?`, `bottomFade?` and fade heights.
 
-Column fields: required `id`, `title`; optional `kind: 'data' | 'actions'`, `width`, `align`, classes, sort settings, `resizable`, `hideable`, min/max width and `value(row)`. Use `kind: 'actions'` for the final command area: it is not user-resizable and keeps action content visible.
+Column fields: required `id`, `title`; optional `kind: 'data' | 'actions'`, `actionPlacement: 'start' | 'end'`, `width`, `align`, classes, sort settings, `resizable`, `hideable`, min/max width and `value(row)`. Action columns can be placed at either edge and resized when explicitly enabled. In fit mode the final visible data column consumes free space so the header background reaches the table edge.
 
 ```svelte
 <script lang="ts">
@@ -255,6 +279,19 @@ Reveals or loops horizontally clipped text.
 - `focusable?`, `title?`, `ariaLabel?`, `active?`.
 - `trigger`: `self | external | both`; `externalBehavior`: `reveal | loop`.
 
+### `Avatar`
+
+User avatar with ordered fallback sources and an initials placeholder.
+
+- Required `name`; `src?`, `fallbackSrcs?`, `size: small | default | large`, `class?`.
+- Failed image sources are skipped automatically in the supplied order.
+
+### `LinkifiedText`
+
+Renders plain text while turning `http(s)` and `www.` URLs into safe links opened in a new tab.
+
+- Required `text`; `class?`, `linkClass?`.
+
 ## Structure, navigation and scrolling
 
 ### `Tabs`
@@ -317,7 +354,7 @@ Stack-friendly right drawer with shared overlay, enter/exit animation, optional 
 
 - Required `open`, `onClose`, `children`.
 - Accessibility: provide `ariaLabel` or `ariaLabelledby`; optional `backdropLabel`.
-- Width: `defaultWidth?`, `minWidth?`, `maxWidth?`, `storageKey?`, `resizable=true`.
+- Width: `defaultWidth?`, `minWidth?`, `minViewportWidth?`, `maxWidth?`, `storageKey?`, `resizable=true`. `minViewportWidth` can enforce a viewport-relative minimum for wide detail drawers.
 - Behavior: `closeOnBackdrop=true`, `zIndex?`, `showOverlay=true`.
 - Styling: `panelClass?`, `overlayClass?`; bindable `panelElement`.
 
@@ -360,7 +397,22 @@ Lightbox for a full-size image.
 </ImageViewer>
 ```
 
+### `ImageGallery`
+
+Responsive Splide thumbnail gallery. Every thumbnail opens the full image in `ImageViewer`.
+
+- Required `images: ImageGalleryItem[]`; each item has `src` and optional `alt`, `title`, `sourceUrl`.
+- `label='Галерея изображений'`, `class?`.
+- Images stay remote; the component does not download or persist them.
+
 ## Feedback and confirmation
+
+### `ProgressBar`
+
+Determinate or indeterminate accessible progress indicator.
+
+- `value=null` renders indeterminate progress; otherwise it is clamped between zero and `max=100`.
+- `tone: primary | success | danger | warning`, `ariaLabel='Прогресс'`, `class?`.
 
 ### `ToastViewport`, `toast`, `showFormResultToast`
 
@@ -379,9 +431,10 @@ Mount one viewport near the application root. Toasts are queued through exported
 
 Melt-based confirmation dialog for destructive or consequential actions.
 
-- Required `trigger` snippet and `title`.
+- Required `title`; optional `trigger` snippet. Omitting the trigger supports externally controlled `bind:open` dialogs.
 - `children?`, `description?`, `confirmLabel?`, `cancelLabel?`.
-- `variant`: `default`, `danger`; trigger button variant/size/class can be configured.
+- `variant`: `default`, `warning`, `danger`; trigger button variant/size/class can be configured.
+- Long titles and descriptions remain centered and scroll safely within the viewport.
 - `confirmForm?`, `disabled?`, `loading?`, bindable `open`, `closeOnOutsideClick?`.
 - `onConfirm?`, `onOpenChange?`.
 
@@ -420,13 +473,16 @@ Keyboard- and pointer-friendly reorderable list wrapper.
 
 ### `ChatComposer`
 
-Resizable multiline composer with Enter-to-send, Shift+Enter newline, emoji picker, character count and optional staged attachments.
+Resizable multiline composer with Enter-to-send, Shift+Enter newline, emoji picker, character count, replies and optional staged attachments.
 
-- Required `onSend(value)`; bindable `value`.
-- `onSendAttachments?(value, files)` enables combined file sending.
+- Required `onSend(value, context)`; bindable `value`. The context includes `replyTo`.
+- `onSendAttachments?(value, files, context)` enables combined file sending.
+- `replyTo?`, `onCancelReply?` render and manage a reply preview.
+- `confirmBeforeSend?(value, context)` can approve or reject a send before callbacks run.
 - `id?`, `placeholder?`, `ariaLabel?`, `maxLength=4000`.
 - `minHeight=112`, `maxHeight=320`, `resizable=true`, `disabled=false`.
-- `attachments=false`, `attachmentAccept?`, `maxAttachmentSize=10 MiB`, `maxAttachments=5`, `class?`.
+- `attachments=false`, `attachmentAccept='*/*'`, `maxAttachmentSize=10 MiB`, `maxAttachments=5`, `class?`.
+- With attachments enabled, pasting files from the clipboard stages them exactly like file-picker input.
 - Send callbacks return `boolean | void` or a promise; `false` keeps the draft.
 
 ```svelte
@@ -435,13 +491,15 @@ Resizable multiline composer with Enter-to-send, Shift+Enter newline, emoji pick
 
 ### `ChatMessageList`
 
-Scrollable chat transcript with sender avatars/initials, message bubbles, attachments and optional deletion actions.
+Scrollable chat transcript with channel metadata, sender avatars/fallbacks, clickable links, replies, attachments and optional deletion actions.
 
 - Required `messages: ChatMessageListItem[]`.
 - `loading=false`, `currentActorType='staff'`, `loadingText?`, `emptyText?`, `contentId?`.
-- `attachmentUrl?(attachmentId)`.
+- `attachmentUrl?(attachmentId)`, `autoScroll=true`.
 - `canDeleteMessage?(message)`, `onDeleteMessage?`, `onDeleteAttachment?`, `class?`.
-- Sender types are `customer | staff | system`; attachments carry id, original name, MIME type and byte size.
+- `onReply?(message)` enables reply actions; `onNavigateReply?(messageId)` overrides navigation to the referenced message.
+- Sender types are `customer | staff | system`; senders may provide ordered `avatarFallbackUrls`; attachments carry id, original name, MIME type and byte size.
+- The viewport follows the newest message initially and after appends unless the reader has intentionally scrolled away.
 
 ```svelte
 <ChatMessageList {messages} currentActorType="staff" attachmentUrl={(id) => `/api/chat/attachments/${id}`} />
@@ -454,4 +512,3 @@ Scrollable chat transcript with sender avatars/initials, message bubbles, attach
 - Destructive confirmation: `ConfirmDialog`, never browser `confirm()`.
 - Page/feature-specific behavior belongs in a wrapper in the consuming application, not in this package.
 - A component is universal only when its API makes sense without restaurant, order, customer, tenant or billing knowledge.
-

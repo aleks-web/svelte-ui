@@ -6,7 +6,7 @@
 	import { confirmDialogVariants, type ConfirmDialogVariant } from './confirm-dialog.variants';
 
 	type Props = {
-		trigger: Snippet;
+		trigger?: Snippet;
 		children?: Snippet;
 		title: string;
 		description?: string;
@@ -84,25 +84,27 @@
 	}
 </script>
 
-<button
-	{...dialog.trigger}
-	type="button"
-	{disabled}
-	class={buttonVariants({
-		variant: triggerVariant,
-		size: triggerSize,
-		class: triggerClass
-	})}
->
-	{@render trigger()}
-</button>
+{#if trigger}
+	<button
+		{...dialog.trigger}
+		type="button"
+		{disabled}
+		class={buttonVariants({
+			variant: triggerVariant,
+			size: triggerSize,
+			class: triggerClass
+		})}
+	>
+		{@render trigger()}
+	</button>
+{/if}
 
 <dialog
 	{...dialog.content}
 	role="alertdialog"
 	aria-labelledby={titleId}
 	aria-describedby={description ? descriptionId : undefined}
-	class={`${styles.content()} melt-dialog-content m-auto p-0 opacity-0 transition-[opacity,scale] duration-200 data-[open]:scale-100 data-[open]:opacity-100`}
+	class={`${styles.content()} melt-dialog-content p-0 opacity-0 transition-[opacity,scale] duration-200 data-[open]:scale-100 data-[open]:opacity-100`}
 >
 	<header class={styles.header()}>
 		<h2 id={titleId} class={styles.title()}>{title}</h2>
