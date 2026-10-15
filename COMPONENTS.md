@@ -189,7 +189,7 @@ Required props:
 
 Important optional props:
 
-- Rendering: `cells?` snippet map, `emptyText`, `minWidth`, `class`, `rowClass?`, `density='default'` (`compact | default | comfortable`).
+- Rendering: `cells?` snippet map, optional `toolbar` snippet, `emptyText`, `minWidth`, `class`, `rowClass?`, `density='default'` (`compact | default | comfortable`). The toolbar is rendered inside `DataTable` above the bordered table frame; built-in column settings stay aligned at its right edge.
 - Sorting: `sort?`, `onSortChange?`; directions are `ASC | DESC`.
 - Widths: `resizableColumns=true`, `resizeMode='fit'` (`fit | overflow`), min/max width, step and `onColumnResize?`.
 - Persistence: `persistColumnWidths?`, `persistColumnLayout?`, `storageKey?`, `columnSettings?`,
@@ -203,28 +203,38 @@ Column fields: required `id`, `title`; optional `kind: 'data' | 'actions'`, `act
 
 ```svelte
 <script lang="ts">
-  import { DataTable, Button, type DataTableColumn } from '@aleks-web/ui';
-  const columns: DataTableColumn<Customer>[] = [
-    { id: 'name', title: 'Клиент', value: (row) => row.name, resizable: true },
-    { id: 'actions', title: '', kind: 'actions', hideable: false }
-  ];
+	import { DataTable, Button, SearchForm, type DataTableColumn } from '@aleks-web/ui';
+
+	let query = $state('');
+	const columns: DataTableColumn<Customer>[] = [
+		{ id: 'name', title: 'Клиент', value: (row) => row.name, resizable: true },
+		{ id: 'actions', title: '', kind: 'actions', hideable: false }
+	];
 </script>
 
 <DataTable
-  rows={customers}
-  {columns}
-  rowKey={(row) => row.id}
-  ariaLabel="Клиенты"
-  selectableRows
-  bind:selectedRowKeys
-  persistColumnLayout
-  defaultHiddenColumnIds={['email']}
-  storageKey="customers"
-  cells={{ actions: actionsCell }}
-/>
+	rows={customers}
+	{columns}
+	rowKey={(row) => row.id}
+	ariaLabel="Клиенты"
+	selectableRows
+	bind:selectedRowKeys
+	persistColumnLayout
+	defaultHiddenColumnIds={['email']}
+	storageKey="customers"
+	cells={{ actions: actionsCell }}
+>
+	{#snippet toolbar()}
+		<SearchForm
+			bind:value={query}
+			placeholder="Найти клиента…"
+			onSearch={(value) => (query = value)}
+		/>
+	{/snippet}
+</DataTable>
 
 {#snippet actionsCell(row: Customer)}
-  <Button size="compact" variant="secondary">Подробнее</Button>
+	<Button size="compact" variant="secondary">Подробнее</Button>
 {/snippet}
 ```
 
@@ -233,7 +243,7 @@ Column fields: required `id`, `title`; optional `kind: 'data' | 'actions'`, `act
 Low-level column visibility/order popover used with `DataTable` integrations.
 
 - Required: `items: DataTableColumnSettingsItem[]`, `onReorder`, `onVisibilityChange`, `onReset`.
-- Optional `ariaLabel`.
+- Optional `ariaLabel`, `triggerText='Колонки'`.
 
 Prefer `DataTable`'s built-in `columnSettings` API unless building a specialized wrapper.
 

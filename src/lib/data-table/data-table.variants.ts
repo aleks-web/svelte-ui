@@ -2,9 +2,12 @@ import { tv } from 'tailwind-variants';
 
 export const dataTableVariants = tv({
 	slots: {
-		root: 'data-table relative min-h-0 w-full min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white',
+		root: 'flex min-h-0 w-full min-w-0 flex-col gap-3',
+		toolbar: 'flex shrink-0 flex-wrap items-center justify-between gap-3',
+		toolbarContent: 'min-w-0 flex-1',
+		frame:
+			'data-table relative min-h-0 w-full min-w-0 grow overflow-hidden rounded-xl border border-gray-200 bg-white',
 		loading: 'absolute inset-0 z-20 flex items-center justify-center bg-white',
-		columnSettings: 'absolute top-[7px] right-2 z-[12]',
 		topAccent:
 			'pointer-events-none absolute inset-x-0 top-0 z-10 h-4 rounded-t-xl border-t-2 border-blue-700/80',
 		headerBorder: 'pointer-events-none absolute inset-x-0 z-[7] h-px bg-blue-200',
@@ -29,13 +32,22 @@ export const dataTableHeadCellVariants = tv({
 			actions: 'w-px min-w-max overflow-visible whitespace-nowrap pl-4 pr-8'
 		}
 	},
-	defaultVariants: { resizeMode: 'fit', sortable: false, align: 'left', kind: 'data' }
+	defaultVariants: {
+		resizeMode: 'fit',
+		sortable: false,
+		align: 'left',
+		kind: 'data'
+	}
 });
 
 export const dataTableSortButtonVariants = tv({
 	base: 'data-table__sort-button group flex h-full w-full cursor-pointer items-center gap-1.5 bg-transparent px-4 text-inherit transition-colors outline-none hover:bg-blue-100/60 focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-inset',
 	variants: {
-		align: { left: 'justify-start', center: 'justify-center', right: 'justify-end' }
+		align: {
+			left: 'justify-start',
+			center: 'justify-center',
+			right: 'justify-end'
+		}
 	},
 	defaultVariants: { align: 'left' }
 });
@@ -43,7 +55,10 @@ export const dataTableSortButtonVariants = tv({
 export const dataTableSortIconVariants = tv({
 	base: 'h-3.5 w-3.5 shrink-0 transition-colors',
 	variants: {
-		active: { true: 'text-blue-700', false: 'text-slate-400 group-hover:text-blue-600' }
+		active: {
+			true: 'text-blue-700',
+			false: 'text-slate-400 group-hover:text-blue-600'
+		}
 	},
 	defaultVariants: { active: false }
 });
@@ -89,5 +104,10 @@ export const dataTableCellVariants = tv({
 			actions: 'w-px min-w-max overflow-visible whitespace-nowrap pl-4 pr-8'
 		}
 	},
-	defaultVariants: { density: 'default', resizeMode: 'fit', align: 'left', kind: 'data' }
+	defaultVariants: {
+		density: 'default',
+		resizeMode: 'fit',
+		align: 'left',
+		kind: 'data'
+	}
 });

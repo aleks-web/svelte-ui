@@ -61,6 +61,7 @@
 		columns: readonly C[];
 		rowKey: (row: T) => string | number;
 		cells?: Partial<Record<C['id'], Snippet<[row: T, state: DataTableRowState]>>>;
+		toolbar?: Snippet;
 		ariaLabel: string;
 		emptyText?: string;
 		minWidth?: string;
@@ -112,6 +113,7 @@
 		columns,
 		rowKey,
 		cells = {},
+		toolbar,
 		ariaLabel,
 		emptyText = 'Нет данных',
 		minWidth = '48rem',
@@ -451,9 +453,7 @@
 		if (onColumnOrderChange) void onColumnOrderChange([...columnOrder]);
 		if (onColumnVisibilityChange) {
 			const hiddenSet = new Set(hiddenColumnIds);
-			void onColumnVisibilityChange(
-				columnOrder.filter((columnId) => !hiddenSet.has(columnId))
-			);
+			void onColumnVisibilityChange(columnOrder.filter((columnId) => !hiddenSet.has(columnId)));
 		}
 
 		window.requestAnimationFrame(() => {
@@ -946,222 +946,225 @@
 	});
 </script>
 
-<div
-	class={styles.root({ class: className })}
-	data-column-settings={showsColumnSettings ? 'true' : undefined}
-	aria-busy={!tableReady}
->
-	{#if !tableReady}
-		<div class={styles.loading()}>
-			<Spinner size={loadingSpinnerSize} label={`Загрузка таблицы «${ariaLabel}»`} />
-		</div>
-	{:else}
-		<div
-			aria-hidden="true"
-			class={styles.topAccent()}
-			style="-webkit-mask-image: linear-gradient(to right, transparent 0, black 12px, black calc(100% - 12px), transparent 100%); mask-image: linear-gradient(to right, transparent 0, black 12px, black calc(100% - 12px), transparent 100%);"
-		></div>
-		<div aria-hidden="true" class={styles.headerBorder()} style:top={`${headerHeight}px`}></div>
-	{/if}
-	{#if tableReady && showsColumnSettings}
-		<div class={styles.columnSettings()}>
-			<DataTableColumnSettings
-				items={columnSettingsItems}
-				onReorder={handleColumnReorder}
-				onVisibilityChange={handleColumnVisibilityChange}
-				onReset={resetColumnLayout}
-			/>
+<div class={styles.root({ class: className })} aria-busy={!tableReady}>
+	{#if toolbar || showsColumnSettings}
+		<div class={styles.toolbar()}>
+			{#if toolbar}
+				<div class={styles.toolbarContent()}>{@render toolbar()}</div>
+			{/if}
+			{#if showsColumnSettings}
+				<DataTableColumnSettings
+					items={columnSettingsItems}
+					onReorder={handleColumnReorder}
+					onVisibilityChange={handleColumnVisibilityChange}
+					onReset={resetColumnLayout}
+				/>
+			{/if}
 		</div>
 	{/if}
 
-	<ScrollArea
-		class={tableReady ? 'h-full w-full' : 'invisible h-full w-full'}
-		contentId={id ? `${id}-scroll` : undefined}
-		contentStyle={`-webkit-mask-image: ${scrollMask}; mask-image: ${scrollMask};`}
-		verticalStartOffset={headerHeight + 1}
-		verticalLabel={`Вертикальная прокрутка: ${ariaLabel}`}
-		horizontalLabel={`Горизонтальная прокрутка: ${ariaLabel}`}
-		onScrollStateChange={handleScrollStateChange}
-	>
-		<table
-			class={styles.table()}
-			style:min-width={resizeMode === 'fit' ? '100%' : minWidth}
-			style:width={resizedTableWidth === null
-				? undefined
-				: resizeMode === 'fit'
-					? '100%'
-					: `max(100%, ${resizedTableWidth}px)`}
-			aria-label={ariaLabel}
+	<div class={styles.frame()}>
+		{#if !tableReady}
+			<div class={styles.loading()}>
+				<Spinner size={loadingSpinnerSize} label={`Загрузка таблицы «${ariaLabel}»`} />
+			</div>
+		{:else}
+			<div
+				aria-hidden="true"
+				class={styles.topAccent()}
+				style="-webkit-mask-image: linear-gradient(to right, transparent 0, black 12px, black calc(100% - 12px), transparent 100%); mask-image: linear-gradient(to right, transparent 0, black 12px, black calc(100% - 12px), transparent 100%);"
+			></div>
+			<div aria-hidden="true" class={styles.headerBorder()} style:top={`${headerHeight}px`}></div>
+		{/if}
+
+		<ScrollArea
+			class={tableReady ? 'h-full w-full' : 'invisible h-full w-full'}
+			contentId={id ? `${id}-scroll` : undefined}
+			contentStyle={`-webkit-mask-image: ${scrollMask}; mask-image: ${scrollMask};`}
+			verticalStartOffset={headerHeight + 1}
+			verticalLabel={`Вертикальная прокрутка: ${ariaLabel}`}
+			horizontalLabel={`Горизонтальная прокрутка: ${ariaLabel}`}
+			onScrollStateChange={handleScrollStateChange}
 		>
-			<colgroup>
-				{#if selectableRows}
-					<col style:width={`${safeSelectionColumnWidth}px`} />
-				{/if}
-				{#each visibleColumns as column (column.id)}
-					<col style:width={getColumnWidth(column)} />
-				{/each}
-			</colgroup>
-			<thead class={styles.head()}>
-				<tr bind:this={headerRowElement}>
+			<table
+				class={styles.table()}
+				style:min-width={resizeMode === 'fit' ? '100%' : minWidth}
+				style:width={resizedTableWidth === null
+					? undefined
+					: resizeMode === 'fit'
+						? '100%'
+						: `max(100%, ${resizedTableWidth}px)`}
+				aria-label={ariaLabel}
+			>
+				<colgroup>
 					{#if selectableRows}
-						<th class={styles.selectionHead()} scope="col">
-							<Checkbox
-								checked={visibleSelectionState}
-								disabled={selectableVisibleKeys.length === 0}
-								ariaLabel="Выбрать все строки на текущей странице"
-								class={styles.selectionControl()}
-								onclick={(event) => {
-									event.stopPropagation();
-									toggleVisibleSelection();
-								}}
-							/>
-						</th>
+						<col style:width={`${safeSelectionColumnWidth}px`} />
 					{/if}
 					{#each visibleColumns as column (column.id)}
-						<th
-							class={dataTableHeadCellVariants({
-								resizeMode,
-								sortable: Boolean(column.sortKey),
-								align: getColumnAlign(column),
-								kind: column.kind ?? 'data',
-								class: column.headerClass
-							})}
-							data-column-kind={column.kind ?? 'data'}
-							data-before-actions={isBeforeActionsColumn(column) ? 'true' : undefined}
-							data-last-column={visibleColumns.at(-1)?.id === column.id ? 'true' : undefined}
-							data-sortable={column.sortKey ? 'true' : 'false'}
-							aria-sort={getAriaSort(column)}
-						>
-							{#if column.sortKey}
-								<Button
-									type="button"
-									variant="ghost"
-									size="inline"
-									class={dataTableSortButtonVariants({ align: getColumnAlign(column) })}
-									aria-label={getSortButtonLabel(column)}
-									onclick={() => handleSort(column)}
-								>
-									<span>{column.title}</span>
-									<svg
-										aria-hidden="true"
-										class={dataTableSortIconVariants({ active: sort?.key === column.sortKey })}
-										viewBox="0 0 16 16"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="1.75"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-									>
-										{#if sort?.key === column.sortKey && sort.direction === 'ASC'}
-											<path d="m4.5 9.5 3.5-3.5 3.5 3.5" />
-										{:else if sort?.key === column.sortKey}
-											<path d="m4.5 6.5 3.5 3.5 3.5-3.5" />
-										{:else}
-											<path d="m5 6 3-3 3 3M5 10l3 3 3-3" />
-										{/if}
-									</svg>
-								</Button>
-							{:else}
-								{column.title}
-							{/if}
-							{#if showsResizeHandle(column)}
-								<!-- A focusable ARIA separator is an interactive resize widget. -->
-								<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-								<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-								<div
-									class={dataTableResizeHandleVariants({
-										active: resizingColumnId === column.id
-									})}
-									role="separator"
-									tabindex="0"
-									aria-label={`Изменить ширину колонки «${column.title}»`}
-									aria-orientation="vertical"
-									aria-valuemin={Math.round(getColumnMinWidth(column))}
-									aria-valuemax={Number.isFinite(getColumnMaxWidth(column))
-										? Math.round(getColumnMaxWidth(column))
-										: undefined}
-									aria-valuenow={Math.round(columnWidths[column.id] ?? getColumnMinWidth(column))}
-									onfocus={() => void measureColumnWidths()}
-									onpointerdown={(event) => startColumnResize(column, event)}
-									onkeydown={(event) => handleResizeKeydown(column, event)}
-								>
-									<span
-										aria-hidden="true"
-										class={dataTableResizeLineVariants({
-											active: resizingColumnId === column.id
-										})}
-									></span>
-								</div>
-							{/if}
-						</th>
+						<col style:width={getColumnWidth(column)} />
 					{/each}
-				</tr>
-			</thead>
-			<tbody class={styles.body()}>
-				{#each rows as row (rowKey(row))}
-					{@const key = rowKey(row)}
-					{@const state = getRowState(key)}
-					<tr
-						class={dataTableRowVariants({
-							interactive: Boolean(onRowClick),
-							selected: selectableRows && selectedKeySet.has(key),
-							class: getRowClass(row)
-						})}
-						tabindex={onRowClick ? 0 : undefined}
-						aria-label={onRowClick ? rowLabel?.(row) : undefined}
-						onclick={(event) => handleRowClick(row, event)}
-						onkeydown={(event) => handleRowKeydown(row, event)}
-						onpointerenter={() => (hoveredRowKey = key)}
-						onpointerleave={() => handleRowPointerLeave(key)}
-						onfocusin={() => (focusedRowKey = key)}
-						onfocusout={(event) => handleRowFocusOut(key, event)}
-					>
+				</colgroup>
+				<thead class={styles.head()}>
+					<tr bind:this={headerRowElement}>
 						{#if selectableRows}
-							<td class={styles.selectionCell()}>
+							<th class={styles.selectionHead()} scope="col">
 								<Checkbox
-									checked={selectedKeySet.has(key)}
-									disabled={!(isRowSelectable?.(row) ?? true)}
-									ariaLabel={`Выбрать строку ${rowLabel?.(row) ?? key}`}
+									checked={visibleSelectionState}
+									disabled={selectableVisibleKeys.length === 0}
+									ariaLabel="Выбрать все строки на текущей странице"
 									class={styles.selectionControl()}
 									onclick={(event) => {
 										event.stopPropagation();
-										handleRowSelection(row);
+										toggleVisibleSelection();
 									}}
 								/>
-							</td>
+							</th>
 						{/if}
 						{#each visibleColumns as column (column.id)}
-							{@const customCell = getCustomCell(column.id)}
-							<td
-								class={dataTableCellVariants({
-									density,
+							<th
+								class={dataTableHeadCellVariants({
 									resizeMode,
+									sortable: Boolean(column.sortKey),
 									align: getColumnAlign(column),
 									kind: column.kind ?? 'data',
-									class: column.cellClass
+									class: column.headerClass
 								})}
+								data-column-kind={column.kind ?? 'data'}
+								data-before-actions={isBeforeActionsColumn(column) ? 'true' : undefined}
+								data-sortable={column.sortKey ? 'true' : 'false'}
+								aria-sort={getAriaSort(column)}
 							>
-								{#if customCell}
-									{@render customCell(row, state)}
-								{:else if column.value}
-									{column.value(row)}
+								{#if column.sortKey}
+									<Button
+										type="button"
+										variant="ghost"
+										size="inline"
+										class={dataTableSortButtonVariants({ align: getColumnAlign(column) })}
+										aria-label={getSortButtonLabel(column)}
+										onclick={() => handleSort(column)}
+									>
+										<span>{column.title}</span>
+										<svg
+											aria-hidden="true"
+											class={dataTableSortIconVariants({ active: sort?.key === column.sortKey })}
+											viewBox="0 0 16 16"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.75"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											{#if sort?.key === column.sortKey && sort.direction === 'ASC'}
+												<path d="m4.5 9.5 3.5-3.5 3.5 3.5" />
+											{:else if sort?.key === column.sortKey}
+												<path d="m4.5 6.5 3.5 3.5 3.5-3.5" />
+											{:else}
+												<path d="m5 6 3-3 3 3M5 10l3 3 3-3" />
+											{/if}
+										</svg>
+									</Button>
+								{:else}
+									{column.title}
 								{/if}
-							</td>
+								{#if showsResizeHandle(column)}
+									<!-- A focusable ARIA separator is an interactive resize widget. -->
+									<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+									<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+									<div
+										class={dataTableResizeHandleVariants({
+											active: resizingColumnId === column.id
+										})}
+										role="separator"
+										tabindex="0"
+										aria-label={`Изменить ширину колонки «${column.title}»`}
+										aria-orientation="vertical"
+										aria-valuemin={Math.round(getColumnMinWidth(column))}
+										aria-valuemax={Number.isFinite(getColumnMaxWidth(column))
+											? Math.round(getColumnMaxWidth(column))
+											: undefined}
+										aria-valuenow={Math.round(columnWidths[column.id] ?? getColumnMinWidth(column))}
+										onfocus={() => void measureColumnWidths()}
+										onpointerdown={(event) => startColumnResize(column, event)}
+										onkeydown={(event) => handleResizeKeydown(column, event)}
+									>
+										<span
+											aria-hidden="true"
+											class={dataTableResizeLineVariants({
+												active: resizingColumnId === column.id
+											})}
+										></span>
+									</div>
+								{/if}
+							</th>
 						{/each}
 					</tr>
-				{:else}
-					<tr>
-						<td
-							class={styles.emptyCell()}
-							colspan={visibleColumns.length + (selectableRows ? 1 : 0)}
+				</thead>
+				<tbody class={styles.body()}>
+					{#each rows as row (rowKey(row))}
+						{@const key = rowKey(row)}
+						{@const state = getRowState(key)}
+						<tr
+							class={dataTableRowVariants({
+								interactive: Boolean(onRowClick),
+								selected: selectableRows && selectedKeySet.has(key),
+								class: getRowClass(row)
+							})}
+							tabindex={onRowClick ? 0 : undefined}
+							aria-label={onRowClick ? rowLabel?.(row) : undefined}
+							onclick={(event) => handleRowClick(row, event)}
+							onkeydown={(event) => handleRowKeydown(row, event)}
+							onpointerenter={() => (hoveredRowKey = key)}
+							onpointerleave={() => handleRowPointerLeave(key)}
+							onfocusin={() => (focusedRowKey = key)}
+							onfocusout={(event) => handleRowFocusOut(key, event)}
 						>
-							{emptyText}
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	</ScrollArea>
+							{#if selectableRows}
+								<td class={styles.selectionCell()}>
+									<Checkbox
+										checked={selectedKeySet.has(key)}
+										disabled={!(isRowSelectable?.(row) ?? true)}
+										ariaLabel={`Выбрать строку ${rowLabel?.(row) ?? key}`}
+										class={styles.selectionControl()}
+										onclick={(event) => {
+											event.stopPropagation();
+											handleRowSelection(row);
+										}}
+									/>
+								</td>
+							{/if}
+							{#each visibleColumns as column (column.id)}
+								{@const customCell = getCustomCell(column.id)}
+								<td
+									class={dataTableCellVariants({
+										density,
+										resizeMode,
+										align: getColumnAlign(column),
+										kind: column.kind ?? 'data',
+										class: column.cellClass
+									})}
+								>
+									{#if customCell}
+										{@render customCell(row, state)}
+									{:else if column.value}
+										{column.value(row)}
+									{/if}
+								</td>
+							{/each}
+						</tr>
+					{:else}
+						<tr>
+							<td
+								class={styles.emptyCell()}
+								colspan={visibleColumns.length + (selectableRows ? 1 : 0)}
+							>
+								{emptyText}
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</ScrollArea>
+	</div>
 </div>
 
 <style>
@@ -1181,16 +1184,5 @@
 	.data-table__head-cell[data-column-kind='actions'],
 	.data-table__head-cell[data-before-actions='true'] {
 		box-shadow: none;
-	}
-
-	.data-table[data-column-settings='true']
-		.data-table__head-cell[data-last-column='true'][data-sortable='false'] {
-		padding-right: 3.5rem;
-	}
-
-	.data-table[data-column-settings='true']
-		.data-table__head-cell[data-last-column='true'][data-sortable='true']
-		.data-table__sort-button {
-		padding-right: 3.5rem;
 	}
 </style>

@@ -9,7 +9,7 @@
 
 <script lang="ts">
 	import { Popover } from 'melt/builders';
-	import { DotsVerticalOutline } from 'flowbite-svelte-icons';
+	import { TableColumnOutline } from 'flowbite-svelte-icons';
 	import Button from '../button/Button.svelte';
 	import Checkbox from '../checkbox/Checkbox.svelte';
 	import ScrollArea from '../ScrollArea.svelte';
@@ -22,6 +22,7 @@
 		onVisibilityChange: (columnId: string, visible: boolean) => void | Promise<void>;
 		onReset: () => void | Promise<void>;
 		ariaLabel?: string;
+		triggerText?: string;
 	};
 
 	let {
@@ -29,7 +30,8 @@
 		onReorder,
 		onVisibilityChange,
 		onReset,
-		ariaLabel = 'Настроить колонки таблицы'
+		ariaLabel = 'Настроить колонки таблицы',
+		triggerText = 'Колонки'
 	}: Props = $props();
 
 	const popover = new Popover({
@@ -54,7 +56,8 @@
 		aria-label={ariaLabel}
 		title={ariaLabel}
 	>
-		<DotsVerticalOutline class={styles.triggerIcon()} strokeWidth={1.75} />
+		<TableColumnOutline class={styles.triggerIcon()} strokeWidth={1.75} />
+		<span class={styles.triggerText()}>{triggerText}</span>
 	</button>
 
 	<section {...popover.content} class={styles.content()} aria-label={ariaLabel}>

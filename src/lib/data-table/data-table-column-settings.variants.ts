@@ -4,8 +4,9 @@ export const dataTableColumnSettingsVariants = tv({
 	slots: {
 		root: 'relative',
 		trigger:
-			'flex size-8 cursor-pointer items-center justify-center rounded-lg border-0 bg-transparent text-blue-600 shadow-none transition-colors hover:bg-blue-100/70 hover:text-blue-800 focus-visible:bg-blue-50 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:outline-none',
+			'inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-xs transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:outline-none',
 		triggerIcon: 'size-4',
+		triggerText: 'hidden sm:inline',
 		content:
 			'z-[220] w-[min(21rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-2xl shadow-slate-950/15 outline-none',
 		header: 'border-b border-blue-100 bg-linear-to-r from-blue-50/90 to-indigo-50/70 px-4 py-3',
