@@ -35,7 +35,7 @@ For development before publishing, a consuming application can pin a GitHub comm
 
 ```svelte
 <script lang="ts">
-  import { Button, Select, type SelectOption } from '@aleks-web/ui';
+  import { Button, Select, TagInput, TreeView, type SelectOption } from '@aleks-web/ui';
 </script>
 ```
 

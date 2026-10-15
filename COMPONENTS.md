@@ -97,14 +97,34 @@ Labeled, bindable text controls that forward native input/textarea attributes.
 
 Accessible Melt-based single select. Use instead of native `<select>` in application UI.
 
-- `options: SelectOption[]` is required; each option has `value`, `label`, optional `disabled`.
+- `options: SelectOption[]` is required; each option has `value`, `label`, optional `disabled` and search-only `keywords`.
 - `value` is bindable; `name?`, `placeholder='Выберите значение'`, `ariaLabel?`.
 - `disabled=false`, `required=false`.
+- `searchable=false` switches the trigger to a Melt combobox; `searchPlaceholder='Поиск…'` and `emptyText='Ничего не найдено'` configure its text.
 - `size`: `default` (default), `compact`.
 - `class?`, `triggerClass?`, `menuClass?`, `onChange(value)?`.
 
 ```svelte
 <Select bind:value={status} options={statusOptions} name="status" ariaLabel="Статус" />
+<Select bind:value={projectId} options={projects} searchable searchPlaceholder="Найти проект…" />
+```
+
+### `TagInput`
+
+Accessible bindable list of short string values with keyboard entry and removal.
+
+- Bindable `value: string[]`; optional `name`, `label`, `description`, `placeholder`, `ariaLabel`.
+- `disabled=false`, `required=false`, `unique=true`, `maxTags=Infinity`.
+- `separators=[',', ';']`; Enter, configured separators, blur and separator-containing paste commit values. Backspace on an empty input removes the final tag.
+- `normalize?(value)` and `validate?(value)` customize accepted values; `invalidText`, `class`, `inputClass`, `onChange?(values)` are optional.
+
+```svelte
+<TagInput
+  bind:value={extensions}
+  name="allowedExtensions"
+  label="Разрешённые расширения"
+  normalize={(value) => value.startsWith('.') ? value.toLowerCase() : `.${value.toLowerCase()}`}
+/>
 ```
 
 ### `Checkbox`
@@ -377,6 +397,25 @@ Stack-friendly right drawer with shared overlay, enter/exit animation, optional 
 <ResizableDrawer open={drawerOpen} onClose={() => drawerOpen = false} ariaLabel="Карточка клиента" storageKey="customer-drawer">
   <CustomerDetails />
 </ResizableDrawer>
+```
+
+### `TreeView`
+
+Melt-based accessible single-selection tree for hierarchical navigation and lazy-loaded directory browsers.
+
+- Required `items: TreeViewItem[]`; each item has `id`, `label` and optional `description`, `children`, `hasChildren`, `disabled`.
+- Bindable `selected` and `expanded`; `loadingIds` marks expanded nodes whose children are loading.
+- `ariaLabel`, `emptyText`, `loadingText`, `class`, `onSelect?(item)`, `onExpandedChange?(ids)`.
+- `hasChildren=true` keeps the expander visible before lazy children arrive. Set it to `false` after loading an empty branch.
+
+```svelte
+<TreeView
+  items={directories}
+  bind:selected={selectedPath}
+  bind:expanded={expandedPaths}
+  {loadingIds}
+  onExpandedChange={loadExpandedDirectories}
+/>
 ```
 
 ## Files and media

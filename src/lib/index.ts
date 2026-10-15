@@ -35,10 +35,12 @@ export { default as Spoiler } from './spoiler/Spoiler.svelte';
 export { default as StatCard } from './stat-card/StatCard.svelte';
 export { default as StatsGrid } from './stats-grid/StatsGrid.svelte';
 export { default as Switch } from './Switch.svelte';
+export { default as TagInput } from './tag-input/TagInput.svelte';
 export { default as Tabs } from './Tabs.svelte';
 export { default as TextArea } from './text-area/TextArea.svelte';
 export { default as TextField } from './text-field/TextField.svelte';
 export { default as ToastViewport } from './toast/ToastViewport.svelte';
+export { default as TreeView } from './tree-view/TreeView.svelte';
 
 export type { ActionMenuOption, ActionMenuTone } from './action-menu/ActionMenu.svelte';
 export type { BadgeShape, BadgeSize, BadgeVariant } from './badge/badge.variants';
@@ -92,6 +94,7 @@ export type {
 export type { StatsGridColumns, StatsGridGap } from './stats-grid/stats-grid.variants';
 export type { TabItem } from './Tabs.svelte';
 export type { ToastPosition, ToastVariant } from './toast/toast.variants';
+export type { TreeViewItem } from './tree-view/TreeView.svelte';
 
 export {
 	parseStatsGridPreferences,
