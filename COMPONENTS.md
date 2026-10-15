@@ -192,7 +192,9 @@ Important optional props:
 - Rendering: `cells?` snippet map, `emptyText`, `minWidth`, `class`, `rowClass?`, `density='default'` (`compact | default | comfortable`).
 - Sorting: `sort?`, `onSortChange?`; directions are `ASC | DESC`.
 - Widths: `resizableColumns=true`, `resizeMode='fit'` (`fit | overflow`), min/max width, step and `onColumnResize?`.
-- Persistence: `persistColumnWidths?`, `persistColumnLayout?`, `storageKey?`, `columnSettings?`, order/visibility callbacks.
+- Persistence: `persistColumnWidths?`, `persistColumnLayout?`, `storageKey?`, `columnSettings?`,
+  `defaultHiddenColumnIds?`, order/visibility callbacks. Default-hidden columns remain available in
+  settings; resetting the layout restores this initial visibility set.
 - Selection: `selectableRows?`, bindable `selectedRowKeys`, `isRowSelectable?`, `onSelectionChange?`, `selectionColumnWidth?`.
 - Interaction: `onRowClick?`, `rowLabel?`.
 - Loading and scrolling: `loadingSpinnerSize?`, `topFade?`, `bottomFade?` and fade heights.
@@ -216,6 +218,7 @@ Column fields: required `id`, `title`; optional `kind: 'data' | 'actions'`, `act
   selectableRows
   bind:selectedRowKeys
   persistColumnLayout
+  defaultHiddenColumnIds={['email']}
   storageKey="customers"
   cells={{ actions: actionsCell }}
 />

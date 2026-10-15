@@ -92,6 +92,7 @@
 		selectionColumnWidth?: number;
 		columnSettings?: boolean;
 		persistColumnLayout?: boolean;
+		defaultHiddenColumnIds?: readonly string[];
 		onColumnOrderChange?: (columnIds: string[]) => void | Promise<void>;
 		onColumnVisibilityChange?: (visibleColumnIds: string[]) => void | Promise<void>;
 	};
@@ -142,6 +143,7 @@
 		selectionColumnWidth = 52,
 		columnSettings = true,
 		persistColumnLayout = true,
+		defaultHiddenColumnIds = [],
 		onColumnOrderChange,
 		onColumnVisibilityChange
 	}: Props = $props();
@@ -441,13 +443,18 @@
 		if (widthKey) window.localStorage.removeItem(widthKey);
 
 		columnOrder = columns.filter((column) => column.kind !== 'actions').map((column) => column.id);
-		hiddenColumnIds = [];
+		hiddenColumnIds = normalizeHiddenColumnIds(defaultHiddenColumnIds);
 		columnWidths = {};
 		hasMeasuredColumnWidths = false;
 		tableReady = false;
 
 		if (onColumnOrderChange) void onColumnOrderChange([...columnOrder]);
-		if (onColumnVisibilityChange) void onColumnVisibilityChange([...columnOrder]);
+		if (onColumnVisibilityChange) {
+			const hiddenSet = new Set(hiddenColumnIds);
+			void onColumnVisibilityChange(
+				columnOrder.filter((columnId) => !hiddenSet.has(columnId))
+			);
+		}
 
 		window.requestAnimationFrame(() => {
 			window.requestAnimationFrame(() => {
@@ -892,7 +899,14 @@
 
 	onMount(() => {
 		const storedLayout = readStoredColumnLayout();
-		if (storedLayout) applyStoredColumnLayout(storedLayout);
+		if (storedLayout) {
+			applyStoredColumnLayout(storedLayout);
+		} else {
+			columnOrder = columns
+				.filter((column) => column.kind !== 'actions')
+				.map((column) => column.id);
+			hiddenColumnIds = normalizeHiddenColumnIds(defaultHiddenColumnIds);
+		}
 
 		measureHeaderHeight();
 		if (typeof ResizeObserver !== 'undefined' && headerRowElement) {
