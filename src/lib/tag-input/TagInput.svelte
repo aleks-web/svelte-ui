@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { CloseOutline } from 'flowbite-svelte-icons';
+	import type { Snippet } from 'svelte';
 	import { tagInputVariants } from './tag-input.variants';
 
 	type Props = {
@@ -20,6 +21,7 @@
 		class?: string;
 		inputClass?: string;
 		onChange?: (value: string[]) => void | Promise<void>;
+		actions?: Snippet;
 	};
 
 	let {
@@ -39,7 +41,8 @@
 		invalidText = 'Значение не соответствует формату',
 		class: className = '',
 		inputClass = '',
-		onChange
+		onChange,
+		actions
 	}: Props = $props();
 
 	let draft = $state('');
@@ -100,7 +103,12 @@
 </script>
 
 <div class={styles.root({ class: className })}>
-	{#if label}<span class={styles.label()}>{label}</span>{/if}
+	{#if label || actions}
+		<div class="mb-1.5 flex min-h-6 items-center justify-between gap-3">
+			{#if label}<span class={styles.label({ class: 'mb-0' })}>{label}</span>{/if}
+			{#if actions}<div class="shrink-0">{@render actions()}</div>{/if}
+		</div>
+	{/if}
 	<div class={styles.field()} aria-invalid={invalid || undefined}>
 		{#each value as tag, index (`${tag}-${index}`)}
 			<span class={styles.tag()}>

@@ -10,7 +10,7 @@ export const selectVariants = tv({
 		searchField:
 			'group flex w-full items-center border border-gray-300 bg-white text-gray-800 shadow-sm transition outline-none hover:border-blue-300 hover:bg-blue-50/30 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600/20',
 		searchInput:
-			'min-w-0 flex-1 bg-transparent px-3.5 text-sm outline-none placeholder:text-gray-400 disabled:cursor-not-allowed disabled:text-gray-400',
+			'min-w-0 flex-1 border-0 bg-transparent px-3.5 text-sm shadow-none outline-none ring-0 placeholder:text-gray-400 focus:border-0 focus:ring-0 disabled:cursor-not-allowed disabled:text-gray-400',
 		searchTrigger:
 			'flex h-full shrink-0 cursor-pointer items-center justify-center px-3 text-gray-500 outline-none disabled:pointer-events-none disabled:cursor-not-allowed',
 		menu: 'z-[240] max-h-72 overflow-y-auto rounded-xl border border-gray-200 bg-white p-1.5 shadow-xl shadow-gray-950/10 outline-none',

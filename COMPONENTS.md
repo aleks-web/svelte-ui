@@ -117,6 +117,7 @@ Accessible bindable list of short string values with keyboard entry and removal.
 - `disabled=false`, `required=false`, `unique=true`, `maxTags=Infinity`.
 - `separators=[',', ';']`; Enter, configured separators, blur and separator-containing paste commit values. Backspace on an empty input removes the final tag.
 - `normalize?(value)` and `validate?(value)` customize accepted values; `invalidText`, `class`, `inputClass`, `onChange?(values)` are optional.
+- `actions?` renders compact actions at the right edge of the label row without coupling the component to a particular reset or restore behavior.
 
 ```svelte
 <TagInput

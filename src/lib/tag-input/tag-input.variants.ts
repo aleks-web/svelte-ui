@@ -11,7 +11,7 @@ export const tagInputVariants = tv({
 		remove:
 			'inline-flex size-5 shrink-0 items-center justify-center rounded-md text-blue-600 transition hover:bg-blue-100 hover:text-blue-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
 		input:
-			'min-w-28 flex-1 bg-transparent px-1 py-0.5 text-sm text-gray-800 outline-none placeholder:text-gray-400 disabled:cursor-not-allowed disabled:text-gray-400',
+			'min-w-28 flex-1 border-0 bg-transparent px-1 py-0.5 text-sm text-gray-800 shadow-none outline-none ring-0 placeholder:text-gray-400 focus:border-0 focus:ring-0 disabled:cursor-not-allowed disabled:text-gray-400',
 		description: 'mt-1.5 text-xs leading-5 text-gray-500',
 		error: 'mt-1.5 text-xs font-medium text-red-600'
 	},
