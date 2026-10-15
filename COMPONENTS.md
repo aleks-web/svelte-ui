@@ -244,6 +244,8 @@ Low-level column visibility/order popover used with `DataTable` integrations.
 
 - Required: `items: DataTableColumnSettingsItem[]`, `onReorder`, `onVisibilityChange`, `onReset`.
 - Optional `ariaLabel`, `triggerText='Колонки'`.
+- Opens from the bottom-right when space allows, stays inside the viewport, and limits scrolling to the column list. The header and footer remain visible.
+- Reserves space for its scrollbar so column labels and controls are not covered. Opening and closing are animated unless reduced motion is requested by the operating system.
 
 Prefer `DataTable`'s built-in `columnSettings` API unless building a specialized wrapper.
 
