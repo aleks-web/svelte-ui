@@ -156,7 +156,10 @@ Visible single-choice control. Place `Radio` children inside `RadioGroup`.
 
 ### `Switch`
 
-Compact bindable boolean toggle. Public API: `bind:checked`.
+Compact bindable boolean toggle.
+
+- Bindable `checked`; `name?`, `disabled=false`, `ariaLabel='Переключатель'`, `class?`, `onChange?(checked)`.
+- Uses `role="switch"`, exposes `aria-checked` and visibly moves the thumb when its value changes.
 
 ```svelte
 <Switch bind:checked={notificationsEnabled} />
@@ -379,6 +382,7 @@ Compact page title row with breadcrumbs and actions. It can keep the semantic pa
 - Required `title`.
 - `showTitle=true`; set it to `false` for a breadcrumbs-only layout. The title remains available to assistive technologies and `titleAfter` is hidden with it.
 - `breadcrumbs?`, `titleAfter?` snippet, `actions?` snippet, `class?`.
+- Breadcrumbs and actions align to the top edge, including in breadcrumbs-only layouts.
 
 ```svelte
 <PageHeader title="Команда" breadcrumbs={[{ label: 'Настройки', href: '/settings' }, { label: 'Команда' }]}>
@@ -494,6 +498,7 @@ Melt-based confirmation dialog for destructive or consequential actions.
 - `children?`, `description?`, `confirmLabel?`, `cancelLabel?`.
 - `variant`: `default`, `warning`, `danger`; trigger button variant/size/class can be configured.
 - Long titles and descriptions remain centered and scroll safely within the viewport.
+- The description flows directly into optional content and actions without decorative horizontal separators.
 - `confirmForm?`, `disabled?`, `loading?`, bindable `open`, `closeOnOutsideClick?`.
 - `onConfirm?`, `onOpenChange?`.
 

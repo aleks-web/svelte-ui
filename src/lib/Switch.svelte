@@ -1,47 +1,48 @@
 <script lang="ts">
 	import { Toggle } from 'melt/builders';
+	import { twMerge } from 'tailwind-merge';
 
-	let { checked = $bindable(false) }: { checked?: boolean } = $props();
+	type Props = {
+		checked?: boolean;
+		name?: string;
+		disabled?: boolean;
+		ariaLabel?: string;
+		class?: string;
+		onChange?: (checked: boolean) => void;
+	};
+
+	let {
+		checked = $bindable(false),
+		name,
+		disabled = false,
+		ariaLabel = 'Переключатель',
+		class: className = '',
+		onChange
+	}: Props = $props();
 
 	const toggle = new Toggle({
 		value: () => checked,
+		disabled: () => disabled,
 		onValueChange: (next) => {
 			checked = next;
+			onChange?.(next);
 		}
 	});
 </script>
 
-<div class="flex items-center">
+<div class={twMerge('inline-flex items-center', className)}>
 	<button
 		{...toggle.trigger}
-		class:checked={toggle.value}
-		class="group data-[state=checked][&>*]:bg-red-200 relative h-6 cursor-pointer rounded-full
-                 bg-blue-100 transition-colors
-				 outline-none hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2
-				 data-[state=checked]:bg-blue-300 data-[state=checked]:hover:bg-blue-400
-            "
+		type="button"
+		role="switch"
+		aria-checked={toggle.value}
+		aria-label={ariaLabel}
+		class="group relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full bg-slate-200 p-0.5 transition-colors duration-200 outline-none hover:bg-slate-300 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[checked]:bg-blue-600 data-[checked]:hover:bg-blue-700"
 	>
-		<span class="thumb block rounded-full bg-blue-400 transition group-[.checked]:bg-blue-600"
+		<span
+			aria-hidden="true"
+			class="block size-5 translate-x-0 rounded-full bg-white shadow-sm ring-1 ring-slate-950/5 transition-transform duration-200 group-data-[checked]:translate-x-5"
 		></span>
 	</button>
-	<input {...toggle.hiddenInput} />
+	<input {...toggle.hiddenInput} {name} disabled={disabled || undefined} />
 </div>
-
-<style>
-	button {
-		--w: 2.75rem;
-		--padding: 0.125rem;
-		width: var(--w);
-	}
-
-	.thumb {
-		--size: 1.25rem;
-		width: var(--size);
-		height: var(--size);
-		transform: translateX(var(--padding));
-	}
-
-	:global([data-state='checked']) .thumb {
-		transform: translateX(calc(var(--w) - var(--size) - var(--padding)));
-	}
-</style>

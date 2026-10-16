@@ -2,7 +2,7 @@ import { tv } from 'tailwind-variants';
 
 export const pageHeaderVariants = tv({
 	slots: {
-		root: 'flex min-w-0 flex-wrap items-end justify-between gap-3',
+		root: 'flex min-w-0 flex-wrap items-start justify-between gap-3',
 		content: 'flex min-w-0 flex-col gap-1.5',
 		breadcrumbs: 'min-w-0',
 		breadcrumbList: 'flex min-w-0 flex-wrap items-center gap-y-1 text-sm',
