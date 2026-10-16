@@ -89,10 +89,10 @@
 		{...tabs.triggerList}
 		aria-label={ariaLabel}
 		class={twMerge(
-			'flex min-w-max gap-1',
+			'flex gap-1',
 			orientation === 'horizontal'
-				? 'overflow-x-auto border-b border-gray-200'
-				: 'shrink-0 flex-col border-r border-gray-200',
+				? 'w-full min-w-0 overflow-x-auto border-b border-gray-200'
+				: 'min-w-max shrink-0 flex-col border-r border-gray-200',
 			listClass
 		)}
 	>
@@ -104,7 +104,7 @@
 				id={internalValue}
 				aria-controls={`${internalValue}-panel`}
 				class={twMerge(
-					'inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-600 transition-colors outline-none hover:text-gray-950 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[active]:font-semibold data-[active]:text-blue-800',
+					'inline-flex shrink-0 cursor-pointer items-center gap-2 text-sm font-medium text-gray-600 transition-colors outline-none hover:text-gray-950 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[active]:font-semibold data-[active]:text-blue-800',
 					orientation === 'horizontal'
 						? 'border-b-2 border-transparent px-4 py-3 data-[active]:border-blue-800'
 						: 'border-r-2 border-transparent px-4 py-3 text-left data-[active]:border-blue-800',

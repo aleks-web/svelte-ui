@@ -338,6 +338,7 @@ Accessible tab list with optional badges.
 - Bindable `value`; `defaultValue?`, `orientation?`, `loop?`, `activateOnFocus?`, `ariaLabel?`.
 - `class?`, `listClass?`, `triggerClass?`, `contentClass?`, `keepMounted?`, `onValueChange?`.
 - Tab item: required `value`, `label`; optional `disabled`, `badge`, `badgeVariant`.
+- A long horizontal tab list scrolls inside its own row and does not expand the page width.
 
 ```svelte
 <Tabs items={tabs} bind:value={activeTab}>
