@@ -9,6 +9,7 @@
 
 	type Props = {
 		title: string;
+		showTitle?: boolean;
 		breadcrumbs?: BreadcrumbItem[];
 		titleAfter?: Snippet;
 		actions?: Snippet;
@@ -17,6 +18,7 @@
 
 	let {
 		title,
+		showTitle = true,
 		breadcrumbs = [],
 		titleAfter,
 		actions,
@@ -46,12 +48,16 @@
 				</ol>
 			</nav>
 		{/if}
-		<div class={styles.titleRow()}>
-			<h1 class={styles.title()}>{title}</h1>
-			{#if titleAfter}
-				<div class={styles.titleAfter()}>{@render titleAfter()}</div>
-			{/if}
-		</div>
+		{#if showTitle}
+			<div class={styles.titleRow()}>
+				<h1 class={styles.title()}>{title}</h1>
+				{#if titleAfter}
+					<div class={styles.titleAfter()}>{@render titleAfter()}</div>
+				{/if}
+			</div>
+		{:else}
+			<h1 class="sr-only">{title}</h1>
+		{/if}
 	</div>
 
 	{#if actions}

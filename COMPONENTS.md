@@ -373,15 +373,18 @@ Custom scroll area with narrow hover-aware scrollbars and optional fades.
 
 ### `PageHeader`
 
-Compact page title row with breadcrumbs and actions.
+Compact page title row with breadcrumbs and actions. It can keep the semantic page heading while visually showing only breadcrumbs.
 
 - Required `title`.
+- `showTitle=true`; set it to `false` for a breadcrumbs-only layout. The title remains available to assistive technologies and `titleAfter` is hidden with it.
 - `breadcrumbs?`, `titleAfter?` snippet, `actions?` snippet, `class?`.
 
 ```svelte
 <PageHeader title="Команда" breadcrumbs={[{ label: 'Настройки', href: '/settings' }, { label: 'Команда' }]}>
   {#snippet actions()}<Button>Пригласить</Button>{/snippet}
 </PageHeader>
+
+<PageHeader title="Команда" showTitle={false} breadcrumbs={[{ label: 'Настройки', href: '/settings' }, { label: 'Команда' }]} />
 ```
 
 ### `ResizableDrawer`
