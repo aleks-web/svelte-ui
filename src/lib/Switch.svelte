@@ -37,13 +37,38 @@
 		role="switch"
 		aria-checked={toggle.value}
 		aria-label={ariaLabel}
-		class="group relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full bg-slate-200 p-0.5 transition-colors duration-200 outline-none hover:bg-slate-300 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[checked]:bg-blue-600 data-[checked]:hover:bg-blue-700"
+		class="switch-track relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 	>
 		<span
 			aria-hidden="true"
-			class:translate-x-5={toggle.value}
-			class="block size-5 translate-x-0 rounded-full bg-white shadow-sm ring-1 ring-slate-950/5 transition-transform duration-200"
+			class="switch-thumb block size-5 rounded-full bg-white shadow-sm ring-1 ring-slate-950/5 transition-transform duration-200"
 		></span>
 	</button>
 	<input {...toggle.hiddenInput} {name} disabled={disabled || undefined} />
 </div>
+
+<style>
+	.switch-track {
+		background-color: #e2e8f0;
+	}
+
+	.switch-track:hover {
+		background-color: #cbd5e1;
+	}
+
+	.switch-track[data-checked] {
+		background-color: #2563eb;
+	}
+
+	.switch-track[data-checked]:hover {
+		background-color: #1d4ed8;
+	}
+
+	.switch-thumb {
+		transform: translateX(0);
+	}
+
+	.switch-track[data-checked] .switch-thumb {
+		transform: translateX(1.25rem);
+	}
+</style>
