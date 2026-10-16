@@ -41,7 +41,8 @@
 	>
 		<span
 			aria-hidden="true"
-			class="block size-5 translate-x-0 rounded-full bg-white shadow-sm ring-1 ring-slate-950/5 transition-transform duration-200 group-data-[checked]:translate-x-5"
+			class:translate-x-5={toggle.value}
+			class="block size-5 translate-x-0 rounded-full bg-white shadow-sm ring-1 ring-slate-950/5 transition-transform duration-200"
 		></span>
 	</button>
 	<input {...toggle.hiddenInput} {name} disabled={disabled || undefined} />
