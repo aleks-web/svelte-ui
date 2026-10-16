@@ -174,5 +174,9 @@
 		<Button onclick={() => toast.success('Так выглядит системное уведомление')}>Показать уведомление</Button><ToastViewport position="bottom-right" />
 	{:else if name === 'TreeView'}
 		<div class="max-w-md"><TreeView items={treeItems} bind:selected={selectedTree} bind:expanded={expandedTree} ariaLabel="Каталоги FTP" /></div>
+	{:else}
+		<div class="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600">
+			{name} участвует в построении этой лаборатории. Его интерактивное состояние видно прямо на текущей странице.
+		</div>
 	{/if}
 </div>

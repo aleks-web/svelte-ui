@@ -504,6 +504,32 @@ const definitions: Definition[] = [
       "Хлебные крошки, заголовок и действия страницы в единой строке.",
   },
   {
+    name: "ComponentCatalog",
+    group: "Навигация и структура",
+    path: "src/lib/component-catalog/ComponentCatalog.svelte",
+    props: ["applicationGroups", "applicationCount", "applicationComponents"],
+    description:
+      "Готовая двухуровневая лаборатория компонентов пакета и приложения.",
+  },
+  {
+    name: "ComponentShowcase",
+    group: "Навигация и структура",
+    path: "src/lib/component-catalog/ComponentShowcase.svelte",
+    props: [
+      "name",
+      "description",
+      "source",
+      "group",
+      "usage",
+      "props",
+      "importCode",
+      "scopeLabel",
+      "demo",
+    ],
+    description:
+      "Раскрываемая документационная карточка одного компонента с ленивой демонстрацией.",
+  },
+  {
     name: "ResizableDrawer",
     group: "Навигация и структура",
     path: "src/lib/resizable-drawer/ResizableDrawer.svelte",
