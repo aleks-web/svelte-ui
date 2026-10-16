@@ -576,3 +576,38 @@ Scrollable chat transcript with channel metadata, sender avatars/fallbacks, clic
 - Destructive confirmation: `ConfirmDialog`, never browser `confirm()`.
 - Page/feature-specific behavior belongs in a wrapper in the consuming application, not in this package.
 - A component is universal only when its API makes sense without restaurant, order, customer, tenant or billing knowledge.
+
+## Component laboratory
+
+### `ComponentCatalog`
+
+Complete two-scope component laboratory. It owns the registry, grouping, documentation and interactive examples
+for all public package components. A consuming application contributes only its own catalog through a named snippet.
+
+- `applicationGroups?: readonly ComponentCatalogGroup[]` — nested tabs for application-owned groups.
+- `applicationCount?: number` — count shown on the top-level application tab.
+- `applicationComponents?: Snippet<[activeGroup: string]>` — renders application entries for the active group.
+- Package examples are lazy-mounted when an individual `ComponentShowcase` is expanded.
+
+```svelte
+<ComponentCatalog {applicationGroups} applicationCount={applicationEntries.length}>
+  {#snippet applicationComponents(activeGroup)}
+    {#each applicationEntries.filter((entry) => entry.group === activeGroup) as entry}
+      <ComponentShowcase {...entry} scopeLabel="Компонент приложения">
+        {#snippet demo()}<ApplicationDemo name={entry.name} />{/snippet}
+      </ComponentShowcase>
+    {/each}
+  {/snippet}
+</ComponentCatalog>
+```
+
+### `ComponentShowcase`
+
+One lazily expanded documentation card used by `ComponentCatalog` and consuming applications.
+
+- Required: `name`, `description`, `source`, `group`, `usage`, `importCode`.
+- `props?: readonly string[]` lists the public component API.
+- `scopeLabel='Компонент'` identifies the component source.
+- `demo?: Snippet` renders a live or isolated example only while the card is open.
+
+The package also exports read-only `packageComponentCatalog` and `packageComponentGroups` metadata for tooling.

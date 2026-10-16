@@ -35,9 +35,26 @@ For development before publishing, a consuming application can pin a GitHub comm
 
 ```svelte
 <script lang="ts">
-  import { Button, Select, TagInput, TreeView, type SelectOption } from '@aleks-web/ui';
+  import { Button, ComponentCatalog, Select, TagInput, TreeView, type SelectOption } from '@aleks-web/ui';
 </script>
 ```
+
+## Component laboratory
+
+`ComponentCatalog` renders the package-owned component registry, documentation and interactive examples.
+A consuming application can add its own grouped catalog through the `applicationComponents` snippet without
+copying the package catalog:
+
+```svelte
+<ComponentCatalog {applicationGroups} applicationCount={applicationComponents.length}>
+  {#snippet applicationComponents(activeGroup)}
+    <!-- Render application-owned ComponentShowcase entries for activeGroup. -->
+  {/snippet}
+</ComponentCatalog>
+```
+
+Package examples are mounted only when their `Spoiler` is expanded. Integration examples supplied by an
+application remain the application's responsibility and should not mutate production data.
 
 Build and validate in this repository:
 
@@ -52,7 +69,7 @@ npm pack --dry-run
 The consuming application must let Tailwind scan the compiled package files. In its main CSS file add a source relative to that file:
 
 ```css
-@import 'tailwindcss';
+@import "tailwindcss";
 @source '../node_modules/@aleks-web/ui/dist';
 ```
 
