@@ -546,7 +546,7 @@ Copies the current browser URL or an explicitly supplied value and temporarily e
 - `label='Скопировать ссылку'`, `copiedLabel='Ссылка скопирована'`, `errorLabel='Не удалось скопировать ссылку'`.
 - `variant='secondary'`, `size='compact'`, `iconOnly=false`, `disabled=false`, `class?`.
 - `resetAfter=2000`, `onCopied?(value)`, `onError?(error)`.
-- Uses the Clipboard API when available and a synchronous browser fallback otherwise.
+- Uses the Clipboard API when available and a synchronous browser fallback when the API is missing or denied by a sandboxed webview.
 
 ```svelte
 <CopyLinkButton />

@@ -47,8 +47,12 @@
 
 	async function writeClipboard(text: string): Promise<void> {
 		if (navigator.clipboard?.writeText) {
-			await navigator.clipboard.writeText(text);
-			return;
+			try {
+				await navigator.clipboard.writeText(text);
+				return;
+			} catch {
+				// Sandboxed webviews may expose Clipboard API but reject writes.
+			}
 		}
 		const textarea = document.createElement('textarea');
 		textarea.value = text;
