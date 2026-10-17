@@ -79,6 +79,11 @@
 		onValueChange?.(next);
 	}
 
+	function getTriggerAttributes(internalValue: string) {
+		const { onclick: _meltClick, ...attributes } = tabs.getTrigger(internalValue);
+		return attributes;
+	}
+
 	$effect(() => {
 		const firstEnabledValue = items.find((item) => !item.disabled)?.value;
 		const selectedItem = items.find((item) => item.value === value && !item.disabled);
@@ -104,7 +109,7 @@
 		{#each items as item (item.value)}
 			{@const internalValue = toInternalValue(item.value)}
 			<button
-				{...tabs.getTrigger(internalValue)}
+				{...getTriggerAttributes(internalValue)}
 				type="button"
 				onclick={() => selectValue(item.value)}
 				disabled={item.disabled}
