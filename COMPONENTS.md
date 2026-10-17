@@ -335,7 +335,7 @@ Renders plain text while turning `http(s)` and `www.` URLs into safe links opene
 
 ### `Tabs`
 
-Pointer selection updates `value` and calls `onValueChange`, including controlled usage where the active value comes from URL state or another external source.
+Pointer selection updates `value` and calls `onValueChange`, including controlled usage where the active value comes from URL state or another external source. Tab triggers are non-submitting buttons and are safe to place inside forms.
 
 Accessible tab list with optional badges.
 

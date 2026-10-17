@@ -105,6 +105,7 @@
 			{@const internalValue = toInternalValue(item.value)}
 			<button
 				{...tabs.getTrigger(internalValue)}
+				type="button"
 				onclick={() => selectValue(item.value)}
 				disabled={item.disabled}
 				id={internalValue}
