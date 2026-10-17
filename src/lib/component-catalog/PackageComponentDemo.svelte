@@ -8,6 +8,7 @@
 	import Checkbox from '../checkbox/Checkbox.svelte';
 	import ColorPicker from '../color-picker/ColorPicker.svelte';
 	import ConfirmDialog from '../confirm-dialog/ConfirmDialog.svelte';
+	import CopyLinkButton from '../copy-link-button/CopyLinkButton.svelte';
 	import DataTable, { type DataTableColumn } from '../data-table/DataTable.svelte';
 	import DataTableColumnSettings, { type DataTableColumnSettingsItem } from '../data-table/DataTableColumnSettings.svelte';
 	import EditLineText from '../edit-line-text/EditLineText.svelte';
@@ -118,6 +119,8 @@
 		<ColorPicker bind:value={colorValue} ariaLabel="Цвет статуса" /><p class="mt-3 text-sm text-slate-600">Выбранный цвет: {colorValue}</p>
 	{:else if name === 'ConfirmDialog'}
 		<ConfirmDialog title="Удалить запись?" description="Действие показано только в лаборатории." confirmLabel="Удалить" variant="danger" onConfirm={() => { toast.success('Демонстрационное действие подтверждено'); }}><Button variant="danger">Открыть подтверждение</Button></ConfirmDialog>
+	{:else if name === 'CopyLinkButton'}
+		<div class="flex flex-wrap items-center gap-2"><CopyLinkButton value="https://manager.example/tasks?overlay=task%3A4711" onCopied={() => toast.success('Ссылка скопирована')} /><CopyLinkButton iconOnly value="https://manager.example/projects/218" /></div>
 	{:else if name === 'DataTable'}
 		<DataTable {rows} {columns} rowKey={(row) => row.id} ariaLabel="Демонстрационная таблица" storageKey="component-catalog:data-table" columnSettings />
 	{:else if name === 'DataTableColumnSettings'}

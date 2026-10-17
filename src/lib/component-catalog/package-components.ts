@@ -45,6 +45,27 @@ const definitions: Definition[] = [
       "Базовая кнопка с вариантами, размерами, иконками и состоянием загрузки.",
   },
   {
+    name: "CopyLinkButton",
+    group: "Действия",
+    path: "src/lib/copy-link-button/CopyLinkButton.svelte",
+    props: [
+      "value",
+      "label",
+      "copiedLabel",
+      "errorLabel",
+      "variant",
+      "size",
+      "iconOnly",
+      "disabled",
+      "class",
+      "resetAfter",
+      "onCopied",
+      "onError",
+    ],
+    description:
+      "Копирует текущую либо переданную ссылку и показывает доступное состояние результата.",
+  },
+  {
     name: "ExportMenu",
     group: "Действия",
     path: "src/lib/export-menu/ExportMenu.svelte",

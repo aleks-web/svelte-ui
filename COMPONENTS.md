@@ -538,6 +538,21 @@ Melt-based confirmation dialog for destructive or consequential actions.
 </ConfirmDialog>
 ```
 
+### `CopyLinkButton`
+
+Copies the current browser URL or an explicitly supplied value and temporarily exposes the result through its visible label and accessible name.
+
+- `value?: string | (() => string)` defaults to `window.location.href` at click time.
+- `label='Скопировать ссылку'`, `copiedLabel='Ссылка скопирована'`, `errorLabel='Не удалось скопировать ссылку'`.
+- `variant='secondary'`, `size='compact'`, `iconOnly=false`, `disabled=false`, `class?`.
+- `resetAfter=2000`, `onCopied?(value)`, `onError?(error)`.
+- Uses the Clipboard API when available and a synchronous browser fallback otherwise.
+
+```svelte
+<CopyLinkButton />
+<CopyLinkButton iconOnly value={() => canonicalUrl()} />
+```
+
 ### `Spinner`
 
 Accessible loading indicator. `size` accepts `xs | sm | md | lg | xl` or a numeric pixel size; default is `md`. Also accepts `label?` and `class?`.

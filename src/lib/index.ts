@@ -6,6 +6,7 @@ export { default as ChatComposer } from "./chat-composer/ChatComposer.svelte";
 export { default as ChatMessageList } from "./chat-message-list/ChatMessageList.svelte";
 export { default as Checkbox } from "./checkbox/Checkbox.svelte";
 export { default as ColorPicker } from "./color-picker/ColorPicker.svelte";
+export { default as CopyLinkButton } from "./copy-link-button/CopyLinkButton.svelte";
 export { default as ComponentCatalog } from "./component-catalog/ComponentCatalog.svelte";
 export { default as ComponentShowcase } from "./component-catalog/ComponentShowcase.svelte";
 export { default as ConfirmDialog } from "./confirm-dialog/ConfirmDialog.svelte";

@@ -1,6 +1,6 @@
 # @aleks-web/ui
 
-Private Svelte 5 component library shared by Aleks Web applications. Components are domain-agnostic, use the SaaS visual language, Tailwind CSS 4, Tailwind Variants and Melt where an accessible builder is useful.
+Private Svelte 5 component library shared by Aleks Web applications. Components are domain-agnostic, use the SaaS visual language, Tailwind CSS 4, Tailwind Variants and Melt where an accessible builder is useful. URL-state helpers and `CopyLinkButton` let applications expose restorable, shareable views.
 
 The complete component API and examples are in [COMPONENTS.md](./COMPONENTS.md). Rules for AI agents and contributors are in [AGENTS.md](./AGENTS.md).
 
