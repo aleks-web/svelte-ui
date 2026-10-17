@@ -335,6 +335,8 @@ Renders plain text while turning `http(s)` and `www.` URLs into safe links opene
 
 ### `Tabs`
 
+Pointer selection updates `value` and calls `onValueChange`, including controlled usage where the active value comes from URL state or another external source.
+
 Accessible tab list with optional badges.
 
 - Required `items: TabItem[]`, `children` snippet receiving the active item/value.

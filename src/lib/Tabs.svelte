@@ -74,6 +74,12 @@
 		}
 	});
 
+	function selectValue(next: string): void {
+		if (next === value) return;
+		value = next;
+		onValueChange?.(next);
+	}
+
 	$effect(() => {
 		const firstEnabledValue = items.find((item) => !item.disabled)?.value;
 		const selectedItem = items.find((item) => item.value === value && !item.disabled);
@@ -100,6 +106,7 @@
 			{@const internalValue = toInternalValue(item.value)}
 			<button
 				{...tabs.getTrigger(internalValue)}
+				onclick={() => selectValue(item.value)}
 				disabled={item.disabled}
 				id={internalValue}
 				aria-controls={`${internalValue}-panel`}
