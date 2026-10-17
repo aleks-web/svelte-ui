@@ -75,7 +75,6 @@
 	});
 
 	function selectValue(next: string): void {
-		if (next === value) return;
 		value = next;
 		onValueChange?.(next);
 	}
