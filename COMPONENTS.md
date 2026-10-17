@@ -408,6 +408,35 @@ Stack-friendly right drawer with shared overlay, enter/exit animation, optional 
 </ResizableDrawer>
 ```
 
+### `UrlState`
+
+Router-neutral URL-state controller for shareable overlay stacks, tabs, filters, sorting and pagination.
+
+- `createUrlState(adapter)` requires `getUrl()` and `navigate(url, options)`; the consumer connects its router.
+- Readers: `getString`, `getStrings`, `getBoolean`, `getNumber`, `overlays`.
+- Writers: atomic `update`, `setOverlays`, `openOverlay`, `closeOverlay`.
+- `openOverlay` uses a repeated `overlay=kind:id` parameter and preserves stack order.
+- Writes use `replace` history by default; opening an overlay uses `push` by default.
+- Empty strings, `false`, `null` and `undefined` remove a parameter. Arrays become repeated parameters.
+- Overlay identifiers accept only URL-safe identifier characters. Sensitive data must never be placed in URL state.
+
+```ts
+import { createUrlState } from "@aleks-web/ui";
+
+const state = createUrlState({
+  getUrl: () => page.url,
+  navigate: (url, options) =>
+    goto(url, {
+      replaceState: options.history === "replace",
+      keepFocus: options.keepFocus,
+      noScroll: options.noScroll,
+    }),
+});
+
+state.openOverlay({ kind: "task", id: "4711" });
+state.update({ "task.tab": "comments", "filter.status": "active" });
+```
+
 ### `TreeView`
 
 Melt-based accessible single-selection tree for hierarchical navigation and lazy-loaded directory browsers.

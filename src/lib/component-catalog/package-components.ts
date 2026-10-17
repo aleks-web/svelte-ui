@@ -549,6 +549,24 @@ const definitions: Definition[] = [
       "Выезжающая боковая панель с изменяемой пользователем шириной.",
   },
   {
+    name: "UrlState",
+    group: "Навигация и структура",
+    path: "src/lib/url-state/url-state.ts",
+    props: [
+      "getString",
+      "getStrings",
+      "getBoolean",
+      "getNumber",
+      "update",
+      "overlays",
+      "openOverlay",
+      "closeOverlay",
+      "setOverlays",
+    ],
+    description:
+      "Адаптер URL-состояния для стеков окон, вкладок, фильтров и истории браузера.",
+  },
+  {
     name: "ScrollArea",
     group: "Навигация и структура",
     path: "src/lib/ScrollArea.svelte",

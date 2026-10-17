@@ -35,9 +35,12 @@ For development before publishing, a consuming application can pin a GitHub comm
 
 ```svelte
 <script lang="ts">
-  import { Button, ComponentCatalog, Select, TagInput, TreeView, type SelectOption } from '@aleks-web/ui';
+  import { Button, ComponentCatalog, Select, TagInput, TreeView, createUrlState, type SelectOption } from '@aleks-web/ui';
 </script>
 ```
+
+`createUrlState` keeps shareable overlay stacks, tabs and filters in query parameters without coupling the
+package to a specific router. Connect it to SvelteKit `page.url` and `goto`, or provide an equivalent adapter.
 
 ## Component laboratory
 

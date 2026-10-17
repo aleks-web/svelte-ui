@@ -42,6 +42,7 @@
 	import ToastViewport from '../toast/ToastViewport.svelte';
 	import { toast } from '../toast/toast';
 	import TreeView, { type TreeViewItem } from '../tree-view/TreeView.svelte';
+	import { createUrlState } from '../url-state/url-state';
 
 	type DemoRow = { id: number; task: string; status: string };
 	let { name }: { name: string } = $props();
@@ -64,6 +65,13 @@
 		{ id: 'project', title: 'Проект', visible: true, hideable: true },
 		{ id: 'status', title: 'Состояние', visible: true, hideable: true }
 	]);
+	let urlStateDemoUrl = $state(new URL('https://manager.example/tasks'));
+	const urlStateDemo = createUrlState({
+		getUrl: () => urlStateDemoUrl,
+		navigate: (url) => {
+			urlStateDemoUrl = url;
+		}
+	});
 
 	const rows: DemoRow[] = [
 		{ id: 2037555, task: 'Проверить форму обратной связи', status: 'Принята' },
@@ -144,6 +152,16 @@
 		<RadioGroup bind:value={radioValue} ariaLabel="Канал связи" class="flex flex-wrap gap-4"><Radio value="telegram">Telegram</Radio><Radio value="mattermost">Mattermost</Radio></RadioGroup>
 	{:else if name === 'ResizableDrawer'}
 		<Button onclick={() => (drawerOpen = true)}>Открыть панель</Button><ResizableDrawer open={drawerOpen} onClose={() => (drawerOpen = false)} ariaLabel="Демонстрационная панель"><div class="p-6"><h3 class="text-lg font-bold">Выезжающая панель</h3><p class="mt-2 text-sm text-slate-600">Потяните за левую границу, чтобы изменить ширину.</p></div></ResizableDrawer>
+	{:else if name === 'UrlState'}
+		<div class="space-y-3">
+			<code class="block rounded-xl bg-slate-950 px-4 py-3 text-xs break-all text-slate-100">{urlStateDemoUrl.pathname}{urlStateDemoUrl.search}</code>
+			<div class="flex flex-wrap gap-2">
+				<Button size="compact" onclick={() => urlStateDemo.openOverlay({ kind: 'task', id: '4711' })}>Открыть задачу</Button>
+				<Button size="compact" variant="secondary" onclick={() => urlStateDemo.openOverlay({ kind: 'project', id: '218' })}>Добавить проект</Button>
+				<Button size="compact" variant="secondary" onclick={() => urlStateDemo.update({ 'project.tab': 'ftp', 'filter.status': 'active' })}>Вкладка и фильтр</Button>
+				<Button size="compact" variant="ghost" onclick={() => urlStateDemo.closeOverlay()}>Закрыть верхнее окно</Button>
+			</div>
+		</div>
 	{:else if name === 'ScrollArea'}
 		<ScrollArea class="h-44 rounded-xl border border-slate-200" contentClass="space-y-2 p-3">{#each Array(10) as _, index}<div class="rounded-lg bg-slate-50 px-3 py-2 text-sm">Строка прокручиваемой области {index + 1}</div>{/each}</ScrollArea>
 	{:else if name === 'SearchForm'}
