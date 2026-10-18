@@ -379,6 +379,9 @@ Custom scroll area with narrow hover-aware scrollbars and optional fades.
 
 ### `PageHeader`
 
+На узких экранах заголовок, хлебные крошки и действия автоматически переносятся без
+горизонтального переполнения. Компонент рассчитан на рабочую ширину от 320 px.
+
 Compact page title row with breadcrumbs and actions. It can keep the semantic page heading while visually showing only breadcrumbs.
 
 - Required `title`.
@@ -395,6 +398,9 @@ Compact page title row with breadcrumbs and actions. It can keep the semantic pa
 ```
 
 ### `ResizableDrawer`
+
+При ширине viewport меньше 640 px панель занимает всю доступную ширину, а изменение размера
+отключается визуально. Внутреннее содержимое должно использовать адаптивные отступы.
 
 Stack-friendly right drawer with shared overlay, enter/exit animation, optional resize handle and persisted width.
 
@@ -522,6 +528,8 @@ Mount one viewport near the application root. Toasts are queued through exported
 ```
 
 ### `ConfirmDialog`
+
+Отступы и вертикальное расположение кнопок адаптированы для экранов от 320 px.
 
 Melt-based confirmation dialog for destructive or consequential actions.
 
