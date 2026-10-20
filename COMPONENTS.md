@@ -360,6 +360,7 @@ Animated disclosure panel with a reusable gradient header.
 - Required `children`; `summary?` snippet or `title?` text.
 - Bindable `open`; `disabled?`, `ariaLabel?`, `class?`, `triggerClass?`, `contentClass?`.
 - `animationDuration?`, `onOpenChange?`.
+- Expanded content has `p-4` by default; use `contentClass` to override the spacing when needed.
 
 ```svelte
 <Spoiler title="Категория" bind:open><CategoryFields /></Spoiler>
