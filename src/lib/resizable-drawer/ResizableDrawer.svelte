@@ -46,6 +46,7 @@
 	}: Props = $props();
 
 	let mounted = false;
+	let dialogElement: HTMLDialogElement;
 	const dialog = new Dialog({
 		open: false,
 		closeOnOutsideClick: () => closeOnBackdrop,
@@ -140,6 +141,8 @@
 	});
 
 	onMount(() => {
+		// Keep the fixed drawer independent from transformed and scrollable application shells.
+		document.body.append(dialogElement);
 		mounted = true;
 		updateBounds();
 		if (storageKey) {
@@ -156,11 +159,13 @@
 			window.removeEventListener('resize', updateBounds);
 			document.body.style.cursor = previousBodyCursor;
 			document.body.style.userSelect = previousBodyUserSelect;
+			dialogElement.remove();
 		};
 	});
 </script>
 
 <dialog
+	bind:this={dialogElement}
 	{...dialog.content}
 	class={`melt-resizable-drawer m-0 ml-auto h-dvh max-h-none max-w-full translate-x-full overflow-visible border-0 bg-transparent p-0 transition-transform duration-300 ease-out will-change-transform outline-none data-[open]:translate-x-0 motion-reduce:transition-none ${showOverlay ? 'drawer-with-overlay' : ''}`}
 	style:z-index={zIndex + 1}
