@@ -204,6 +204,8 @@
 	}
 
 	.melt-resizable-drawer {
+		position: fixed;
+		inset: 0 0 0 auto;
 		width: var(--drawer-panel-width);
 	}
 
