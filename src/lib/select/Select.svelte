@@ -84,6 +84,7 @@
 	});
 
 	let selectedOption = $derived(options.find((option) => option.value === value));
+	let searchFieldWidth = $state(0);
 	let normalizedSearch = $derived(searchQuery.trim().toLocaleLowerCase());
 	let filteredOptions = $derived(
 		options.filter((option) => {
@@ -107,12 +108,25 @@
 		combobox.input.onfocus(event);
 		if (!wasOpen) searchQuery = '';
 	}
+
+	function trackSearchFieldWidth(node: HTMLElement) {
+		const update = () => {
+			searchFieldWidth = node.getBoundingClientRect().width;
+		};
+		const observer = new ResizeObserver(update);
+		observer.observe(node);
+		update();
+
+		return {
+			destroy: () => observer.disconnect()
+		};
+	}
 </script>
 
 <div class={styles.root({ class: className })}>
 	{#if searchable}
 		<label {...combobox.label} class="sr-only">{ariaLabel}</label>
-		<div class={styles.searchField({ class: triggerClass })}>
+		<div class={styles.searchField({ class: triggerClass })} use:trackSearchFieldWidth>
 			<input
 				{...combobox.input}
 				type="text"
@@ -150,7 +164,11 @@
 	{#if name}<input type="hidden" {name} {value} aria-required={required || undefined} />{/if}
 
 	{#if searchable}
-		<div {...combobox.content} class={styles.menu({ class: menuClass })}>
+		<div
+			{...combobox.content}
+			class={styles.menu({ class: `select-searchable-menu ${menuClass}` })}
+			style:--select-searchable-menu-width={`${searchFieldWidth}px`}
+		>
 			{#each filteredOptions as item (item.value)}
 				{@const optionAttrs = combobox.getOption(item.value, item.label)}
 				<div
@@ -189,3 +207,11 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	/* Melt measures the text input; the visual trigger also includes the arrow button. */
+	:global(.select-searchable-menu) {
+		width: var(--select-searchable-menu-width) !important;
+		min-width: var(--select-searchable-menu-width) !important;
+	}
+</style>

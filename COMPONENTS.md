@@ -101,6 +101,7 @@ Accessible Melt-based single select. Use instead of native `<select>` in applica
 - `value` is bindable; `name?`, `placeholder='Выберите значение'`, `ariaLabel?`.
 - `disabled=false`, `required=false`.
 - `searchable=false` switches the trigger to a Melt combobox; `searchPlaceholder='Поиск…'` and `emptyText='Ничего не найдено'` configure its text.
+- The open menu always matches the full visual trigger width, including the searchable trigger button.
 - `size`: `default` (default), `compact`.
 - `class?`, `triggerClass?`, `menuClass?`, `onChange(value)?`.
 
