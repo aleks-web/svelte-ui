@@ -59,9 +59,10 @@
 		() => value ?? defaultValue ?? items.find((item) => !item.disabled)?.value
 	);
 	value ??= initialValue;
+	let selectedInternalValue = $state(value ? toInternalValue(value) : '');
 
 	const tabs = new MeltTabs({
-		value: () => (value ? toInternalValue(value) : ''),
+		value: () => selectedInternalValue,
 		orientation: () => orientation,
 		loop: () => loop,
 		selectWhenFocused: () => activateOnFocus,
@@ -69,14 +70,14 @@
 			const externalValue = toExternalValue(next);
 			if (externalValue === undefined) return;
 
+			selectedInternalValue = next;
 			value = externalValue;
 			onValueChange?.(externalValue);
 		}
 	});
 
 	function selectValue(next: string): void {
-		value = next;
-		onValueChange?.(next);
+		tabs.value = toInternalValue(next);
 	}
 
 	function getTriggerAttributes(internalValue: string) {
@@ -91,6 +92,10 @@
 
 		if (nextValue === undefined) return;
 		if (value !== nextValue) value = nextValue;
+		const nextInternalValue = toInternalValue(nextValue);
+		if (selectedInternalValue !== nextInternalValue) {
+			selectedInternalValue = nextInternalValue;
+		}
 	});
 </script>
 
