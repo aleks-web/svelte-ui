@@ -1,3 +1,7 @@
+<script module lang="ts">
+	const openDrawerStack: symbol[] = [];
+</script>
+
 <script lang="ts">
 	import { Dialog } from 'melt/builders';
 	import { onMount, untrack, type Snippet } from 'svelte';
@@ -47,11 +51,32 @@
 
 	let mounted = false;
 	let dialogElement: HTMLDialogElement;
+	const drawerId = Symbol('resizable-drawer');
+
+	function registerOpenDrawer(): void {
+		const currentIndex = openDrawerStack.indexOf(drawerId);
+		if (currentIndex === openDrawerStack.length - 1) return;
+		if (currentIndex >= 0) openDrawerStack.splice(currentIndex, 1);
+		openDrawerStack.push(drawerId);
+	}
+
+	function unregisterOpenDrawer(): void {
+		const currentIndex = openDrawerStack.indexOf(drawerId);
+		if (currentIndex >= 0) openDrawerStack.splice(currentIndex, 1);
+	}
+
+	function isTopDrawer(): boolean {
+		return openDrawerStack.at(-1) === drawerId;
+	}
+
 	const dialog = new Dialog({
 		open: false,
-		closeOnOutsideClick: () => closeOnBackdrop,
+		closeOnOutsideClick: () => closeOnBackdrop && isTopDrawer(),
 		onOpenChange: (next) => {
-			if (!next && open) onClose();
+			if (!next && open) {
+				unregisterOpenDrawer();
+				onClose();
+			}
 		}
 	});
 
@@ -137,6 +162,8 @@
 
 	$effect(() => {
 		const nextOpen = open;
+		if (nextOpen) registerOpenDrawer();
+		else unregisterOpenDrawer();
 		if (mounted) dialog.open = nextOpen;
 	});
 
@@ -156,6 +183,7 @@
 		dialog.open = open;
 		window.addEventListener('resize', updateBounds);
 		return () => {
+			unregisterOpenDrawer();
 			window.removeEventListener('resize', updateBounds);
 			document.body.style.cursor = previousBodyCursor;
 			document.body.style.userSelect = previousBodyUserSelect;

@@ -409,7 +409,8 @@ Stack-friendly right drawer with shared overlay, enter/exit animation, optional 
 - Required `open`, `onClose`, `children`.
 - Accessibility: provide `ariaLabel` or `ariaLabelledby`; optional `backdropLabel`.
 - Width: `defaultWidth?`, `minWidth?`, `minViewportWidth?`, `maxWidth?`, `storageKey?`, `resizable=true`. `minViewportWidth` can enforce a viewport-relative minimum for wide detail drawers.
-- Behavior: `closeOnBackdrop=true`, `zIndex?`, `showOverlay=true`.
+- Behavior: `closeOnBackdrop=true`, `zIndex?`, `showOverlay=true`. When several drawers are open,
+  a backdrop click closes only the top drawer and preserves the rest of the stack.
 - Styling: `panelClass?`, `overlayClass?`; bindable `panelElement`.
 
 ```svelte
