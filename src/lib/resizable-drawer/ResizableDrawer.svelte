@@ -73,10 +73,9 @@
 		open: false,
 		closeOnOutsideClick: () => closeOnBackdrop && isTopDrawer(),
 		onOpenChange: (next) => {
-			if (!next && open) {
-				unregisterOpenDrawer();
-				onClose();
-			}
+			// Keep the closing drawer at the top until the current pointer event finishes.
+			// Otherwise another document-level outside-click handler can close the drawer below it.
+			if (!next && open) onClose();
 		}
 	});
 
