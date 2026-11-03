@@ -56,6 +56,7 @@
 	let page = $state(2);
 	let pageSize = $state(20);
 	let drawerOpen = $state(false);
+	let nestedDrawerOpen = $state(false);
 	let tabValue = $state('main');
 	let colorValue = $state('#2563eb');
 	let selectedTree = $state('/public_html');
@@ -154,7 +155,7 @@
 	{:else if name === 'Radio' || name === 'RadioGroup'}
 		<RadioGroup bind:value={radioValue} ariaLabel="Канал связи" class="flex flex-wrap gap-4"><Radio value="telegram">Telegram</Radio><Radio value="mattermost">Mattermost</Radio></RadioGroup>
 	{:else if name === 'ResizableDrawer'}
-		<Button onclick={() => (drawerOpen = true)}>Открыть панель</Button><ResizableDrawer open={drawerOpen} onClose={() => (drawerOpen = false)} ariaLabel="Демонстрационная панель"><div class="p-6"><h3 class="text-lg font-bold">Выезжающая панель</h3><p class="mt-2 text-sm text-slate-600">Потяните за левую границу, чтобы изменить ширину.</p></div></ResizableDrawer>
+		<Button onclick={() => (drawerOpen = true)}>Открыть панель</Button><ResizableDrawer open={drawerOpen} onClose={() => (drawerOpen = false)} ariaLabel="Демонстрационная панель"><div class="space-y-4 p-6"><h3 class="text-lg font-bold">Выезжающая панель</h3><p class="text-sm text-slate-600">Потяните за левую границу, чтобы изменить ширину.</p><Button onclick={() => (nestedDrawerOpen = true)}>Открыть вложенную панель</Button></div></ResizableDrawer><ResizableDrawer open={nestedDrawerOpen} onClose={() => (nestedDrawerOpen = false)} ariaLabel="Вложенная демонстрационная панель" defaultWidth={640}><div class="p-6"><h3 class="text-lg font-bold">Верхнее окно</h3><p class="mt-2 text-sm text-slate-600">Клик по фону закроет только эту панель.</p></div></ResizableDrawer>
 	{:else if name === 'UrlState'}
 		<div class="space-y-3">
 			<code class="block rounded-xl bg-slate-950 px-4 py-3 text-xs break-all text-slate-100">{urlStateDemoUrl.pathname}{urlStateDemoUrl.search}</code>
